@@ -47,4 +47,4 @@ Named syntax nodes include `simple_command`, `pipeline`, `redirection`, `variabl
 
 ## Queries
 
-`queries/highlights.scm` provides baseline highlighting for comments, keywords, operators, builtins, labels, strings, variables, substitutions, glob patterns, job specs, and file-test operators. `queries/locals.scm` and `queries/tags.scm` provide starter editor integration queries.
+`queries/highlights.scm` provides baseline highlighting for comments, keywords, operators, builtins, labels, strings, variables, substitutions, glob patterns, job specs, and file-test operators. `queries/folds.scm` provides Neovim-compatible `@fold` captures for block/control-flow and grouped command nodes. `queries/locals.scm` and `queries/tags.scm` provide starter editor integration queries.
