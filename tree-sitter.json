@@ -1,0 +1,42 @@
+{
+  "$schema": "https://tree-sitter.github.io/tree-sitter/assets/schemas/config.schema.json",
+  "grammars": [
+    {
+      "name": "tcsh",
+      "camelcase": "Tcsh",
+      "title": "Tcsh",
+      "scope": "source.tcsh",
+      "file-types": [
+        "tcsh",
+        "csh",
+        "tcshrc",
+        "cshrc",
+        "login",
+        "logout"
+      ],
+      "first-line-regex": "^#!.*\\b(t?csh)\\b"
+    }
+  ],
+  "metadata": {
+    "version": "0.0.0",
+    "license": "MIT",
+    "description": "Tree-sitter grammar for documented tcsh/csh surface syntax.",
+    "authors": [
+      {
+        "name": "tree-sitter-tcsh contributors"
+      }
+    ],
+    "links": {
+      "repository": "https://github.com/j3bit/tree-sitter-tcsh"
+    }
+  },
+  "bindings": {
+    "c": true,
+    "node": false,
+    "rust": false,
+    "python": false,
+    "go": false,
+    "swift": false,
+    "zig": false
+  }
+}

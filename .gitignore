@@ -1,0 +1,34 @@
+# Dependencies
+node_modules/
+
+# Tree-sitter / native build outputs
+build/
+out/
+target/
+*.o
+*.obj
+*.a
+*.so
+*.dylib
+*.dll
+*.node
+*.wasm
+
+# Package-manager and test logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+coverage/
+.nyc_output/
+
+# Local/editor/OS state
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OMX/Codex local workflow state
+.omx/
