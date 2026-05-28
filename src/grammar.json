@@ -270,6 +270,10 @@
         },
         {
           "type": "SYMBOL",
+          "name": "source_statement"
+        },
+        {
+          "type": "SYMBOL",
           "name": "simple_command"
         }
       ]
@@ -344,6 +348,10 @@
                 },
                 {
                   "type": "SYMBOL",
+                  "name": "reserved_argument_word"
+                },
+                {
+                  "type": "SYMBOL",
                   "name": "builtin_command"
                 },
                 {
@@ -359,6 +367,136 @@
           }
         ]
       }
+    },
+    "source_statement": {
+      "type": "PREC_RIGHT",
+      "value": 0,
+      "content": {
+        "type": "SEQ",
+        "members": [
+          {
+            "type": "FIELD",
+            "name": "command",
+            "content": {
+              "type": "SYMBOL",
+              "name": "source_command"
+            }
+          },
+          {
+            "type": "FIELD",
+            "name": "target",
+            "content": {
+              "type": "SYMBOL",
+              "name": "source_target"
+            }
+          },
+          {
+            "type": "REPEAT",
+            "content": {
+              "type": "CHOICE",
+              "members": [
+                {
+                  "type": "SYMBOL",
+                  "name": "word"
+                },
+                {
+                  "type": "SYMBOL",
+                  "name": "reserved_argument_word"
+                },
+                {
+                  "type": "SYMBOL",
+                  "name": "redirection"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "source_target": {
+      "type": "CHOICE",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "word"
+        },
+        {
+          "type": "SEQ",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "variable_substitution"
+            },
+            {
+              "type": "REPEAT1",
+              "content": {
+                "type": "SYMBOL",
+                "name": "source_path_suffix"
+              }
+            }
+          ]
+        },
+        {
+          "type": "SEQ",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "backtick_command_substitution"
+            },
+            {
+              "type": "REPEAT1",
+              "content": {
+                "type": "SYMBOL",
+                "name": "source_path_suffix"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "source_path_suffix": {
+      "type": "IMMEDIATE_TOKEN",
+      "content": {
+        "type": "PATTERN",
+        "value": "[A-Za-z0-9_.\\/~-]+"
+      }
+    },
+    "reserved_argument_word": {
+      "type": "CHOICE",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "case"
+        },
+        {
+          "type": "STRING",
+          "value": "default"
+        },
+        {
+          "type": "STRING",
+          "value": "else"
+        },
+        {
+          "type": "STRING",
+          "value": "endif"
+        },
+        {
+          "type": "STRING",
+          "value": "end"
+        },
+        {
+          "type": "STRING",
+          "value": "endsw"
+        },
+        {
+          "type": "STRING",
+          "value": "source"
+        },
+        {
+          "type": "STRING",
+          "value": "then"
+        }
+      ]
     },
     "builtin_command": {
       "type": "CHOICE",
@@ -406,10 +544,6 @@
         {
           "type": "SYMBOL",
           "name": "unlimit_command"
-        },
-        {
-          "type": "SYMBOL",
-          "name": "source_command"
         },
         {
           "type": "SYMBOL",

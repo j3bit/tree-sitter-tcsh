@@ -329,6 +329,47 @@ break
   (break_statement))
 
 ==================
+switch body keyword arguments
+==================
+switch ( $mode )
+case fast:
+  echo fast
+  breaksw
+default:
+  echo default
+endsw
+---
+
+(source_file
+  (switch_statement
+    (expression
+      (word
+        (variable_substitution
+          (identifier))))
+    (case_clause
+      pattern: (word
+        (identifier))
+      (command_list
+        (and_or_command
+          (pipeline
+            (command
+              (simple_command
+                (builtin_command
+                  (echo_command))
+                (word
+                  (identifier)))))))
+      (breaksw_statement))
+    (default_clause
+      (command_list
+        (and_or_command
+          (pipeline
+            (command
+              (simple_command
+                (builtin_command
+                  (echo_command))
+                (reserved_argument_word)))))))))
+
+==================
 builtin surface forms
 ==================
 alias ll 'ls -l'
@@ -490,11 +531,11 @@ sched +60 echo later
     (and_or_command
       (pipeline
         (command
-          (simple_command
-            (builtin_command
-              (source_command))
-            (word
-              (bare_word)))))))
+          (source_statement
+            command: (source_command)
+            target: (source_target
+              (word
+                (bare_word))))))))
   (command_list
     (and_or_command
       (pipeline
@@ -744,6 +785,64 @@ sched +60 echo later
               (echo_command))
             (word
               (identifier))))))))
+
+==================
+structured source targets
+==================
+source ~/.tcshrc
+. ./common.csh
+source $HOME/.tcshrc
+source *.csh
+source `pwd`/common.csh
+---
+
+(source_file
+  (command_list
+    (and_or_command
+      (pipeline
+        (command
+          (source_statement
+            command: (source_command)
+            target: (source_target
+              (word
+                (bare_word))))))))
+  (command_list
+    (and_or_command
+      (pipeline
+        (command
+          (source_statement
+            command: (source_command)
+            target: (source_target
+              (word
+                (bare_word))))))))
+  (command_list
+    (and_or_command
+      (pipeline
+        (command
+          (source_statement
+            command: (source_command)
+            target: (source_target
+              (variable_substitution
+                (identifier))
+              (source_path_suffix)))))))
+  (command_list
+    (and_or_command
+      (pipeline
+        (command
+          (source_statement
+            command: (source_command)
+            target: (source_target
+              (word
+                (glob_pattern))))))))
+  (command_list
+    (and_or_command
+      (pipeline
+        (command
+          (source_statement
+            command: (source_command)
+            target: (source_target
+              (backtick_command_substitution)
+              (source_path_suffix))))))))
 
 ==================
 parenthesized commands continuation and all redirections

@@ -81,15 +81,40 @@ module.exports = grammar({
       repeat(seq(choice('|', '|&'), $.command)),
     ),
 
-    command: $ => choice($.parenthesized_command, $.simple_command),
+    command: $ => choice($.parenthesized_command, $.source_statement, $.simple_command),
 
     parenthesized_command: $ => seq('(', repeat(choice($._statement, $._terminator, $.comment)), ')'),
 
     simple_command: $ => prec.right(seq(
       repeat($.redirection),
       choice($.builtin_command, $.word),
-      repeat(choice($.word, $.builtin_command, $.assignment_word, $.redirection)),
+      repeat(choice($.word, $.reserved_argument_word, $.builtin_command, $.assignment_word, $.redirection)),
     )),
+
+    source_statement: $ => prec.right(seq(
+      field('command', $.source_command),
+      field('target', $.source_target),
+      repeat(choice($.word, $.reserved_argument_word, $.redirection)),
+    )),
+
+    source_target: $ => choice(
+      $.word,
+      seq($.variable_substitution, repeat1($.source_path_suffix)),
+      seq($.backtick_command_substitution, repeat1($.source_path_suffix)),
+    ),
+
+    source_path_suffix: _ => token.immediate(/[A-Za-z0-9_.\/~-]+/),
+
+    reserved_argument_word: _ => choice(
+      'case',
+      'default',
+      'else',
+      'endif',
+      'end',
+      'endsw',
+      'source',
+      'then',
+    ),
 
     builtin_command: $ => choice(
       $.alias_command,
@@ -103,7 +128,6 @@ module.exports = grammar({
       $.bindkey_command,
       $.limit_command,
       $.unlimit_command,
-      $.source_command,
       $.eval_command,
       $.exec_command,
       $.time_command,
