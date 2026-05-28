@@ -244,10 +244,6 @@
           "named": true
         },
         {
-          "type": "source_command",
-          "named": true
-        },
-        {
           "type": "time_command",
           "named": true
         },
@@ -387,6 +383,10 @@
         },
         {
           "type": "simple_command",
+          "named": true
+        },
+        {
+          "type": "source_statement",
           "named": true
         }
       ]
@@ -1178,6 +1178,11 @@
     }
   },
   {
+    "type": "reserved_argument_word",
+    "named": true,
+    "fields": {}
+  },
+  {
     "type": "simple_command",
     "named": true,
     "fields": {},
@@ -1195,6 +1200,10 @@
         },
         {
           "type": "redirection",
+          "named": true
+        },
+        {
+          "type": "reserved_argument_word",
           "named": true
         },
         {
@@ -1272,6 +1281,77 @@
         },
         {
           "type": "while_statement",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "source_statement",
+    "named": true,
+    "fields": {
+      "command": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "source_command",
+            "named": true
+          }
+        ]
+      },
+      "target": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "source_target",
+            "named": true
+          }
+        ]
+      }
+    },
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "redirection",
+          "named": true
+        },
+        {
+          "type": "reserved_argument_word",
+          "named": true
+        },
+        {
+          "type": "word",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "source_target",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "backtick_command_substitution",
+          "named": true
+        },
+        {
+          "type": "source_path_suffix",
+          "named": true
+        },
+        {
+          "type": "variable_substitution",
+          "named": true
+        },
+        {
+          "type": "word",
           "named": true
         }
       ]
@@ -1907,6 +1987,10 @@
   {
     "type": "source",
     "named": false
+  },
+  {
+    "type": "source_path_suffix",
+    "named": true
   },
   {
     "type": "substitution_modifier",
