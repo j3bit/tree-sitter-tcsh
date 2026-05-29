@@ -32,3 +32,4 @@ coverage/
 
 # OMX/Codex local workflow state
 .omx/
+.worktrees/
