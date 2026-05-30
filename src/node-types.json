@@ -1448,14 +1448,22 @@
     "fields": {},
     "children": {
       "multiple": true,
-      "required": false,
+      "required": true,
       "types": [
+        {
+          "type": "braced_variable_suffix",
+          "named": true
+        },
         {
           "type": "identifier",
           "named": true
         },
         {
           "type": "number",
+          "named": true
+        },
+        {
+          "type": "special_parameter",
           "named": true
         },
         {
@@ -1768,6 +1776,10 @@
     "named": true
   },
   {
+    "type": "braced_variable_suffix",
+    "named": true
+  },
+  {
     "type": "break_statement",
     "named": true
   },
@@ -1990,6 +2002,10 @@
   },
   {
     "type": "source_path_suffix",
+    "named": true
+  },
+  {
+    "type": "special_parameter",
     "named": true
   },
   {
