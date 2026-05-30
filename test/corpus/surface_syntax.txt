@@ -102,9 +102,9 @@ echo 'single quoted' "double $USER !:1" `hostname` $argv[1-2] $?prompt !! !$ *.c
             (word
               (glob_pattern))
             (word
-              (variable_substitution))
-            (word
-              (identifier))
+              (variable_substitution
+                (special_parameter)
+                (identifier)))
             (word
               (history_substitution))
             (word
@@ -117,6 +117,58 @@ echo 'single quoted' "double $USER !:1" `hostname` $argv[1-2] $?prompt !! !$ *.c
               (glob_pattern))
             (word
               (job_spec))))))))
+
+==================
+braced variable substitution names
+==================
+echo ${ROOT}
+echo ${1}
+echo ${?prompt}
+source ${ROOT}/env.csh
+---
+
+(source_file
+  (command_list
+    (and_or_command
+      (pipeline
+        (command
+          (simple_command
+            (builtin_command
+              (echo_command))
+            (word
+              (variable_substitution
+                (identifier))))))))
+  (command_list
+    (and_or_command
+      (pipeline
+        (command
+          (simple_command
+            (builtin_command
+              (echo_command))
+            (word
+              (variable_substitution
+                (number))))))))
+  (command_list
+    (and_or_command
+      (pipeline
+        (command
+          (simple_command
+            (builtin_command
+              (echo_command))
+            (word
+              (variable_substitution
+                (special_parameter)
+                (identifier))))))))
+  (command_list
+    (and_or_command
+      (pipeline
+        (command
+          (source_statement
+            command: (source_command)
+            target: (source_target
+              (variable_substitution
+                (identifier))
+              (source_path_suffix))))))))
 
 ==================
 expressions and at assignments
@@ -843,6 +895,56 @@ source `pwd`/common.csh
             target: (source_target
               (backtick_command_substitution)
               (source_path_suffix))))))))
+
+==================
+source target excludes trailing syntax
+==================
+source ./env.csh --verbose >! /tmp/env.log
+. "~/quoted env.csh" extra
+source ${ROOT}/env.csh >& /tmp/source.log
+---
+
+(source_file
+  (command_list
+    (and_or_command
+      (pipeline
+        (command
+          (source_statement
+            command: (source_command)
+            target: (source_target
+              (word
+                (bare_word)))
+            (word
+              (option_word))
+            (redirection
+              (redirect_operator)
+              (word
+                (bare_word))))))))
+  (command_list
+    (and_or_command
+      (pipeline
+        (command
+          (source_statement
+            command: (source_command)
+            target: (source_target
+              (word
+                (double_quoted_string)))
+            (word
+              (identifier)))))))
+  (command_list
+    (and_or_command
+      (pipeline
+        (command
+          (source_statement
+            command: (source_command)
+            target: (source_target
+              (variable_substitution
+                (identifier))
+              (source_path_suffix))
+            (redirection
+              (redirect_operator)
+              (word
+                (bare_word)))))))))
 
 ==================
 parenthesized commands continuation and all redirections

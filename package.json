@@ -15,8 +15,9 @@
     "test:update": "npm exec -- tree-sitter test --update",
     "parse": "npm exec -- tree-sitter parse --grammar-path . --",
     "check:coverage-matrix": "node scripts/check-coverage-matrix.js",
+    "check:node-contract": "node scripts/check-node-contract.js",
     "check:no-error": "node scripts/check-no-error.js examples/sample.tcsh examples/showcase.tcsh",
-    "check": "npm run generate && npm test && npm run check:coverage-matrix && npm run check:coverage-matrix:release && npm run check:no-error && npm run check:queries && npm run check:c-compile",
+    "check": "npm run generate && npm test && npm run check:coverage-matrix && npm run check:coverage-matrix:release && npm run check:node-contract && npm run check:no-error && npm run check:queries && npm run check:c-compile",
     "check:queries": "npm exec -- tree-sitter query --grammar-path . --quiet queries/highlights.scm examples/sample.tcsh && npm exec -- tree-sitter query --grammar-path . --quiet queries/locals.scm examples/sample.tcsh && npm exec -- tree-sitter query --grammar-path . --quiet queries/tags.scm examples/sample.tcsh && npm exec -- tree-sitter query --grammar-path . --quiet queries/folds.scm examples/sample.tcsh",
     "check:coverage-matrix:release": "node scripts/check-coverage-matrix.js --release",
     "check:c-compile": "cc -std=c11 -Isrc -c src/parser.c -o /tmp/tree-sitter-tcsh-parser.o"

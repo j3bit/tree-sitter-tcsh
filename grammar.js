@@ -23,6 +23,9 @@ module.exports = grammar({
 
   extras: $ => [/[ \t\r\f]+/, $.line_continuation],
 
+  inline: $ => [
+    $.braced_variable_name,
+  ],
 
   conflicts: $ => [
     [$.word, $.identifier],
@@ -286,7 +289,27 @@ module.exports = grammar({
     single_quoted_string: _ => token(seq("'", repeat(choice(/[^'\\\n]+/, /\\./)), "'")),
     double_quoted_string: $ => seq('"', repeat(choice(token(/[^"\\$`!\n]+/), $.escape_sequence, $.variable_substitution, $.history_substitution, $.backtick_command_substitution)), '"'),
     backtick_command_substitution: $ => seq('`', repeat(choice(token(/[^`\\$!\n]+/), $.escape_sequence, $.variable_substitution, $.history_substitution)), '`'),
-    variable_substitution: $ => seq('$', choice($.identifier, $.number, token(/[?#$!<]/), seq('{', token(/[^}\n]+/), '}')), optional($.subscript), repeat($.substitution_modifier)),
+    variable_substitution: $ => seq(
+      '$',
+      choice(
+        $.identifier,
+        $.number,
+        prec(1, $.special_parameter),
+        prec(2, seq(alias($._named_special_parameter, $.special_parameter), optional(alias($._immediate_identifier, $.identifier)))),
+        seq('{', $.braced_variable_name, optional($.braced_variable_suffix), '}'),
+      ),
+      optional($.subscript),
+      repeat($.substitution_modifier),
+    ),
+    braced_variable_name: $ => choice(
+      $.identifier,
+      $.number,
+      seq(alias($._named_special_parameter, $.special_parameter), optional(alias($._immediate_identifier, $.identifier))),
+    ),
+    braced_variable_suffix: _ => token.immediate(/[^A-Za-z0-9_}\n][^}\n]*/),
+    _named_special_parameter: _ => token(/[?#]/),
+    _immediate_identifier: _ => token.immediate(/[A-Za-z_][A-Za-z0-9_]*/),
+    special_parameter: _ => token(/[?#$!<]/),
     subscript: $ => seq('[', choice($.number, $.identifier, $.word, '*', '$'), optional(seq('-', choice($.number, '$'))), ']'),
     substitution_modifier: _ => token(seq(':', /[A-Za-z&gpqrxstehlut0-9_-]+/)),
     history_substitution: _ => token(seq('!', choice('!', '$', '*', '^', '#', /-?[0-9]+/, /[A-Za-z_][A-Za-z0-9_]*/, seq(':', /[^\s;|&<>(){}'"`]+/)))) ,
