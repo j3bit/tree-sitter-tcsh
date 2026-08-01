@@ -30,11 +30,8 @@
                     ]
                   },
                   {
-                    "type": "REPEAT1",
-                    "content": {
-                      "type": "SYMBOL",
-                      "name": "_terminator"
-                    }
+                    "type": "SYMBOL",
+                    "name": "_terminator"
                   }
                 ]
               },
@@ -46,11 +43,8 @@
                     "name": "comment"
                   },
                   {
-                    "type": "REPEAT1",
-                    "content": {
-                      "type": "SYMBOL",
-                      "name": "_terminator"
-                    }
+                    "type": "SYMBOL",
+                    "name": "_terminator"
                   }
                 ]
               },
@@ -4425,11 +4419,7 @@
       "name": "line_continuation"
     }
   ],
-  "conflicts": [
-    [
-      "source_file"
-    ]
-  ],
+  "conflicts": [],
   "precedences": [],
   "externals": [
     {

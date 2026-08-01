@@ -39,13 +39,11 @@ module.exports = grammar({
     $.heredoc_end,
   ],
 
-  conflicts: $ => [[$.source_file]],
-
   rules: {
     source_file: $ => seq(
       repeat(choice(
-        seq($._statement, optional($.comment), repeat1($._terminator)),
-        seq($.comment, repeat1($._terminator)),
+        seq($._statement, optional($.comment), $._terminator),
+        seq($.comment, $._terminator),
         $._terminator,
       )),
       optional(choice(seq($._statement, optional($.comment)), $.comment)),

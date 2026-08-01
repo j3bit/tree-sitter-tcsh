@@ -323,3 +323,44 @@ endsw
     (ERROR
       (identifier)
       (bare_word))))
+
+==================
+repeated top-level terminators and comments
+==================
+;
+
+# leading
+
+echo one # inline
+;;
+
+# between
+echo two;;;
+# trailing
+---
+
+(source_file
+  (comment)
+  (command_list
+    (and_or_command
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              (word
+                (identifier))
+              (word
+                (identifier))))))))
+  (comment)
+  (comment)
+  (command_list
+    (and_or_command
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              (word
+                (identifier))
+              (word
+                (identifier))))))))
+  (comment))
