@@ -18,6 +18,23 @@ const PREC = {
   CALL: 14,
 };
 
+function immediateWordFragment($, includeLiteralBang) {
+  return choice(
+    alias(token.immediate(/[^\s#;|&<>(){}'"`$!\\*?\[\]%]+/), $.bare_word),
+    alias(token.immediate(seq('\\', /(.|\r?\n)/)), $.escape_sequence),
+    alias($._immediate_single_quoted_string, $.single_quoted_string),
+    alias($._immediate_dollar_single_quoted_string, $.dollar_single_quoted_string),
+    alias($._immediate_double_quoted_string, $.double_quoted_string),
+    alias($._immediate_backtick_command_substitution, $.backtick_command_substitution),
+    alias($._immediate_variable_substitution, $.variable_substitution),
+    alias($._immediate_history_substitution, $.history_substitution),
+    ...(includeLiteralBang ? [alias(token.immediate('!'), $.literal_bang)] : []),
+    alias(token.immediate(/\^?[A-Za-z0-9_.\/-]*([*?]|\[[^\]\s\n]+\])[A-Za-z0-9_.\/*?\[\]-]*/), $.glob_pattern),
+    alias(token.immediate(/=(?:[0-9]+|-)/), $.directory_stack_reference),
+    alias(token.immediate(seq('%', choice('%', '+', '-', /[0-9]+/, seq('?', /[^\s;|&<>(){}'"`]+/), /[A-Za-z_][A-Za-z0-9_-]*/))), $.job_spec),
+  );
+}
+
 module.exports = grammar({
   name: 'tcsh',
 
@@ -302,19 +319,7 @@ module.exports = grammar({
         $.directory_stack_reference,
         $.job_spec,
       ),
-      repeat(choice(
-        alias(token.immediate(/[^\s#;|&<>(){}'"`$!\\*?\[\]%]+/), $.bare_word),
-        alias(token.immediate(seq('\\', /(.|\r?\n)/)), $.escape_sequence),
-        alias($._immediate_single_quoted_string, $.single_quoted_string),
-        alias($._immediate_dollar_single_quoted_string, $.dollar_single_quoted_string),
-        alias($._immediate_double_quoted_string, $.double_quoted_string),
-        alias($._immediate_backtick_command_substitution, $.backtick_command_substitution),
-        alias($._immediate_variable_substitution, $.variable_substitution),
-        alias($._immediate_history_substitution, $.history_substitution),
-        alias(token.immediate(/\^?[A-Za-z0-9_.\/-]*([*?]|\[[^\]\s\n]+\])[A-Za-z0-9_.\/*?\[\]-]*/), $.glob_pattern),
-        alias(token.immediate(/=(?:[0-9]+|-)/), $.directory_stack_reference),
-        alias(token.immediate(seq('%', choice('%', '+', '-', /[0-9]+/, seq('?', /[^\s;|&<>(){}'"`]+/), /[A-Za-z_][A-Za-z0-9_-]*/))), $.job_spec),
-      )),
+      repeat(immediateWordFragment($, false)),
     )),
 
     parenthesized_expression: $ => seq('(', optional($.expression), ')'),
@@ -365,20 +370,7 @@ module.exports = grammar({
       $.job_spec,
     ),
 
-    _immediate_word_fragment: $ => choice(
-      alias(token.immediate(/[^\s#;|&<>(){}'"`$!\\*?\[\]%]+/), $.bare_word),
-      alias(token.immediate(seq('\\', /(.|\r?\n)/)), $.escape_sequence),
-      alias($._immediate_single_quoted_string, $.single_quoted_string),
-      alias($._immediate_dollar_single_quoted_string, $.dollar_single_quoted_string),
-      alias($._immediate_double_quoted_string, $.double_quoted_string),
-      alias($._immediate_backtick_command_substitution, $.backtick_command_substitution),
-      alias($._immediate_variable_substitution, $.variable_substitution),
-      alias($._immediate_history_substitution, $.history_substitution),
-      alias(token.immediate('!'), $.literal_bang),
-      alias(token.immediate(/\^?[A-Za-z0-9_.\/-]*([*?]|\[[^\]\s\n]+\])[A-Za-z0-9_.\/*?\[\]-]*/), $.glob_pattern),
-      alias(token.immediate(/=(?:[0-9]+|-)/), $.directory_stack_reference),
-      alias(token.immediate(seq('%', choice('%', '+', '-', /[0-9]+/, seq('?', /[^\s;|&<>(){}'"`]+/), /[A-Za-z_][A-Za-z0-9_-]*/))), $.job_spec),
-    ),
+    _immediate_word_fragment: $ => immediateWordFragment($, true),
 
     bare_word: _ => token(prec(-1, /[^\s#;|&<>(){}'"`$!\\*?\[\]%]+/)),
     identifier: _ => /[A-Za-z_][A-Za-z0-9_]*/,
