@@ -1,27 +1,31 @@
-name: CI
+name: Release verification
 
 on:
   push:
-  pull_request:
+    tags:
+      - 'v*'
+  workflow_dispatch:
 
 permissions:
   contents: read
 
 jobs:
-  release-gate:
-    name: Release gate (${{ matrix.os }})
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, macos-latest]
+  verify:
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/checkout@v4
         with:
           repository: tree-sitter/tree-sitter
           ref: cd5b087cd9f45ca6d93ab1954f6b7c8534f324d2
           path: .ci/tree-sitter-runtime
+      - uses: actions/checkout@v4
+        with:
+          repository: tcsh-org/tcsh
+          ref: f773aba56aa128a38712987b1b8bdbc393d1e4d0
+          path: .ci/tcsh-upstream
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -35,30 +39,20 @@ jobs:
           cmake --build "$RUNNER_TEMP/tree-sitter-build" --config Release
           cmake --build "$RUNNER_TEMP/tree-sitter-build" --config Release --target install
           echo "PKG_CONFIG_PATH=$RUNNER_TEMP/tree-sitter-runtime/lib/pkgconfig" >> "$GITHUB_ENV"
-          if [[ "$RUNNER_OS" == "macOS" ]]; then
-            echo "DYLD_LIBRARY_PATH=$RUNNER_TEMP/tree-sitter-runtime/lib" >> "$GITHUB_ENV"
-          else
-            echo "LD_LIBRARY_PATH=$RUNNER_TEMP/tree-sitter-runtime/lib" >> "$GITHUB_ENV"
-          fi
+          echo "LD_LIBRARY_PATH=$RUNNER_TEMP/tree-sitter-runtime/lib" >> "$GITHUB_ENV"
       - run: npm ci
       - run: npm run check:release
-
-  upstream-samples:
-    name: Pinned tcsh samples
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/checkout@v4
-        with:
-          repository: tcsh-org/tcsh
-          ref: f773aba56aa128a38712987b1b8bdbc393d1e4d0
-          path: .ci/tcsh-upstream
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-          cache: npm
-      - run: npm ci
       - name: Verify pinned upstream commit
         shell: bash
         run: test "$(git -C .ci/tcsh-upstream rev-parse HEAD)" = "f773aba56aa128a38712987b1b8bdbc393d1e4d0"
       - run: npm run check:upstream -- --upstream-root "${{ github.workspace }}/.ci/tcsh-upstream"
+      - name: Pack verified artifact
+        run: |
+          mkdir -p dist
+          npm pack --pack-destination dist --cache "$RUNNER_TEMP/npm-cache"
+          npm publish --dry-run --cache "$RUNNER_TEMP/npm-cache" dist/tree-sitter-tcsh-*.tgz
+      - uses: actions/upload-artifact@v4
+        with:
+          name: tree-sitter-tcsh-${{ github.ref_name }}
+          path: dist/*.tgz
+          if-no-files-found: error

@@ -26,8 +26,14 @@ function environmentForPrefix(prefix) {
       .filter(Boolean)
       .join(path.delimiter),
   };
+  const treeSitterLibraryDirectory = execFileSync(
+    'pkg-config',
+    ['--variable=libdir', 'tree-sitter'],
+    { encoding: 'utf8', env: environment },
+  ).trim();
+  const runtimeLibraryDirectories = [libraryDirectory, treeSitterLibraryDirectory];
   if (process.platform === 'darwin') {
-    environment.DYLD_LIBRARY_PATH = [libraryDirectory, process.env.DYLD_LIBRARY_PATH]
+    environment.DYLD_LIBRARY_PATH = [...runtimeLibraryDirectories, process.env.DYLD_LIBRARY_PATH]
       .filter(Boolean)
       .join(path.delimiter);
   } else if (process.platform === 'win32') {
@@ -35,7 +41,7 @@ function environmentForPrefix(prefix) {
       .filter(Boolean)
       .join(path.delimiter);
   } else {
-    environment.LD_LIBRARY_PATH = [libraryDirectory, process.env.LD_LIBRARY_PATH]
+    environment.LD_LIBRARY_PATH = [...runtimeLibraryDirectories, process.env.LD_LIBRARY_PATH]
       .filter(Boolean)
       .join(path.delimiter);
   }
