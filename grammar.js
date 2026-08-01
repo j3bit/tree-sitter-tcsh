@@ -2,8 +2,6 @@
 // Scope: concrete syntax only. Runtime expansion/evaluation is intentionally out of scope.
 
 const PREC = {
-  ASSIGN: 1,
-  TERNARY: 2,
   OR: 3,
   AND: 4,
   BIT_OR: 5,
@@ -15,7 +13,6 @@ const PREC = {
   ADD: 11,
   MULTIPLY: 12,
   PREFIX: 13,
-  CALL: 14,
 };
 
 function immediateWordFragment($, includeLiteralBang) {
@@ -376,7 +373,6 @@ module.exports = grammar({
     identifier: _ => /[A-Za-z_][A-Za-z0-9_]*/,
     number: _ => /[0-9]+/,
     escape_sequence: _ => token(seq('\\', /(.|\r?\n)/)),
-    string: $ => choice($.single_quoted_string, $.double_quoted_string),
     single_quoted_string: $ => seq("'", repeat(choice(token(/[^'!\\\n]+/), $.escape_sequence, $.history_substitution, $.literal_bang)), token.immediate("'")),
     _immediate_single_quoted_string: $ => seq(token.immediate("'"), repeat(choice(token(/[^'!\\\n]+/), $.escape_sequence, $.history_substitution, $.literal_bang)), token.immediate("'")),
     dollar_single_quoted_string: $ => prec(2, seq($.literal_dollar, token.immediate(seq("'", repeat(choice(/[^'\\\n]+/, /\\./)), "'")))),
