@@ -2,6 +2,14 @@
   "name": "tree-sitter-tcsh",
   "version": "0.1.0",
   "description": "Tree-sitter grammar for documented tcsh/csh surface syntax.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/j3bit/tree-sitter-tcsh.git"
+  },
+  "homepage": "https://github.com/j3bit/tree-sitter-tcsh#readme",
+  "bugs": {
+    "url": "https://github.com/j3bit/tree-sitter-tcsh/issues"
+  },
   "type": "commonjs",
   "keywords": [
     "tree-sitter",
@@ -38,10 +46,17 @@
   "files": [
     "grammar.js",
     "tree-sitter.json",
+    "Makefile",
+    "CMakeLists.txt",
     "bindings/c/",
     "queries/",
     "src/",
-    "docs/",
+    "docs/builtin-index.md",
+    "docs/feature-plan.md",
+    "docs/reference-ledger.md",
+    "docs/scanner-design.md",
+    "docs/syntax-coverage-matrix.md",
+    "LICENSE",
     "README.md"
   ]
 }

@@ -22,7 +22,33 @@ Rows marked `unsupported-with-reason` in the coverage matrix are allowed only fo
 
 ## Installation
 
-Install development dependencies from the repository root:
+The npm package is a source-artifact transport; it does not expose a Node
+`require()` API. A C consumer needs a C11 compiler, Make or CMake, pkg-config,
+and a compatible `libtree-sitter` development package that accepts language ABI
+15.
+
+From a repository checkout or unpacked npm tarball, install with Make:
+
+```sh
+make
+make PREFIX=/desired/prefix install
+```
+
+Or install with CMake:
+
+```sh
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/desired/prefix
+cmake --build build
+cmake --build build --target install
+```
+
+Both paths install the canonical public header at
+`include/tree_sitter/tree-sitter-tcsh.h`, a `tree-sitter-tcsh` library,
+pkg-config metadata, and editor queries. Unix-like GCC and Clang builds are the
+declared stable C scope; Windows/MSVC packaging is not yet release-tested.
+
+Install JavaScript development dependencies only when changing or validating
+the grammar:
 
 ```sh
 npm install
@@ -102,10 +128,18 @@ behavior, and scanner tests are specified in `docs/scanner-design.md`.
 
 ## C consumer
 
-The packed artifact contains `bindings/c/tree-sitter-tcsh.h`, `src/parser.c`,
-`src/scanner.c`, and the generated lexer header. Link those sources with a
-compatible `libtree-sitter`; `npm run check:package` demonstrates a clean
-compile, link, language registration, and sample parse from `npm pack`.
+Include `<tree_sitter/tree-sitter-tcsh.h>` and link the installed grammar plus
+the compatible Tree-sitter runtime. The installed pkg-config file carries both
+requirements:
+
+```sh
+cc -std=c11 consumer.c $(pkg-config --cflags --libs tree-sitter-tcsh) -o consumer
+```
+
+`npm run check:package` packs the source artifact, installs it independently
+through Make and CMake, and compiles consumers using only the installed headers,
+libraries, and pkg-config metadata. It also runs the real included-range C API
+contract against the installed package.
 
 ## Contributing
 

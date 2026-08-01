@@ -1,7 +1,7 @@
 #ifndef TREE_SITTER_TCSH_H_
 #define TREE_SITTER_TCSH_H_
 
-#include <tree_sitter/api.h>
+typedef struct TSLanguage TSLanguage;
 
 #ifdef __cplusplus
 extern "C" {
@@ -13,4 +13,4 @@ const TSLanguage *tree_sitter_tcsh(void);
 }
 #endif
 
-#endif
+#endif  // TREE_SITTER_TCSH_H_
