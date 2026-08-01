@@ -1,0 +1,77 @@
+==================
+compositional word boundaries
+==================
+echo pre"$USER"post foo-bar C++ x=y --flag=value foo\ bar
+source pre${dir}/file
+echo $ foo
+echo $a[2]
+---
+
+(source_file
+  (command_list
+    (and_or_command
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              (word
+                (identifier))
+              (word
+                (identifier)
+                (double_quoted_string
+                  (variable_substitution
+                    (identifier)))
+                (bare_word))
+              (word
+                (bare_word))
+              (word
+                (identifier)
+                (bare_word))
+              (word
+                (identifier)
+                (bare_word))
+              (word
+                (bare_word))
+              (word
+                (identifier)
+                (escape_sequence)
+                (bare_word))))))))
+  (command_list
+    (and_or_command
+      (and_command
+        (pipeline
+          (command
+            (source_statement
+              (source_command)
+              (source_target
+                (word
+                  (identifier)
+                  (variable_substitution
+                    (identifier))
+                  (bare_word)))))))))
+  (command_list
+    (and_or_command
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              (word
+                (identifier))
+              (word
+                (literal_dollar))
+              (word
+                (identifier))))))))
+  (command_list
+    (and_or_command
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              (word
+                (identifier))
+              (word
+                (variable_substitution
+                  (identifier)
+                  (subscript
+                    (selector_index
+                      (number))))))))))))

@@ -13,24 +13,40 @@ const statuses = new Set(['implemented','tested','unsupported-with-reason']);
 const placeholders = /^(|TBD|unknown|n\/a)$/i;
 
 const parseCache = new Map();
-function fixtureSource(fixture) {
-  const raw = fs.readFileSync(fixture, 'utf8');
-  if (!fixture.includes('/corpus/')) return raw;
-  const chunks = [];
-  const re = /=+\n[^\n]+\n=+\n([\s\S]*?)\n---\n/g;
-  let m;
-  while ((m = re.exec(raw))) chunks.push(m[1]);
-  return chunks.length ? chunks.join('\n') : raw;
+function parseSource(source, fixture) {
+  const directory = require('node:fs').mkdtempSync(require('node:path').join(require('node:os').tmpdir(), 'tcsh-matrix-'));
+  const tmp = require('node:path').join(directory, 'fixture.tcsh');
+  fs.writeFileSync(tmp, source);
+  const r = require('child_process').spawnSync('npm', ['exec', '--', 'tree-sitter', 'parse', '--grammar-path', '.', '--no-ranges', tmp], { encoding: 'utf8' });
+  fs.rmSync(directory, { recursive: true, force: true });
+  if (r.status !== 0 || /\b(ERROR|MISSING)\b/.test(r.stdout)) {
+    throw new Error(`positive fixture section failed to parse in ${fixture}: ${r.stderr || r.stdout}`);
+  }
+  return r.stdout;
 }
+
 function parseFixture(fixture) {
   if (parseCache.has(fixture)) return parseCache.get(fixture);
-  const tmp = require('node:fs').mkdtempSync(require('node:path').join(require('node:os').tmpdir(), 'tcsh-matrix-')) + '/fixture.tcsh';
-  fs.writeFileSync(tmp, fixtureSource(fixture));
-  const r = require('child_process').spawnSync('npm', ['exec', '--', 'tree-sitter', 'parse', '--grammar-path', '.', '--no-ranges', tmp], { encoding: 'utf8' });
-  if (r.status !== 0) throw new Error(`failed to parse fixture ${fixture}: ${r.stderr || r.stdout}`);
-  if (/\b(ERROR|MISSING)\b/.test(r.stdout)) throw new Error(`fixture ${fixture} contains ERROR/MISSING`);
-  parseCache.set(fixture, r.stdout);
-  return r.stdout;
+  const raw = fs.readFileSync(fixture, 'utf8');
+  if (!fixture.includes('/corpus/')) {
+    const tree = parseSource(raw, fixture);
+    parseCache.set(fixture, tree);
+    return tree;
+  }
+
+  const expectations = [];
+  const re = /=+\n[^\n]+\n=+\n([\s\S]*?)\n---\n\n([\s\S]*?)(?=\n=+\n|$)/g;
+  let match;
+  while ((match = re.exec(raw))) {
+    const source = match[1];
+    const expected = match[2];
+    expectations.push(expected);
+    if (!/\b(ERROR|MISSING)\b/.test(expected)) parseSource(source, fixture);
+  }
+  if (expectations.length === 0) throw new Error(`no corpus sections found in ${fixture}`);
+  const evidence = expectations.join('\n');
+  parseCache.set(fixture, evidence);
+  return evidence;
 }
 
 let errors = [];

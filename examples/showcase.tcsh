@@ -13,11 +13,11 @@ limit coredumpsize 0
 umask 022
 sched +00:05 echo scheduled
 
-# Arithmetic, assignment/update operators, precedence, and ternary expressions.
+# Arithmetic, assignment/update operators, and precedence.
 @ total = 1 + 2 * 3
 @ total++
 @ total -= 2
-@ choice = $total > 3 ? 1 : 0
+@ choice = $total > 3
 
 # Command graph: lists, pipelines, and/or, background suffix, all as syntax.
 echo start ; echo middle && echo ok || echo fail

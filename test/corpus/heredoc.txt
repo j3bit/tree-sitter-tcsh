@@ -1,0 +1,128 @@
+==================
+exact opaque heredoc boundaries
+==================
+if (1) then
+cat <<EOF
+endif
+case x:
+# data
+) "quotes" > redirect-looking
+EOF-near
+ EOF
+EOF 
+EOF
+echo after
+endif
+cat <<EMPTY
+EMPTY
+cat <<'QUOTED'
+$literal `command` !history
+QUOTED
+---
+
+(source_file
+  (if_statement
+    (expression
+      (number))
+    (command_list
+      (and_or_command
+        (and_command
+          (pipeline
+            (command
+              (simple_command
+                (word
+                  (identifier))
+                (redirection
+                  (heredoc_redirect
+                    (redirect_operator)
+                    (heredoc_delimiter)
+                    (heredoc_body)
+                    (heredoc_end)))))))))
+    (command_list
+      (and_or_command
+        (and_command
+          (pipeline
+            (command
+              (simple_command
+                (word
+                  (identifier))
+                (word
+                  (identifier)))))))))
+  (command_list
+    (and_or_command
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              (word
+                (identifier))
+              (redirection
+                (heredoc_redirect
+                  (redirect_operator)
+                  (heredoc_delimiter)
+                  (heredoc_end)))))))))
+  (command_list
+    (and_or_command
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              (word
+                (identifier))
+              (redirection
+                (heredoc_redirect
+                  (redirect_operator)
+                  (heredoc_delimiter)
+                  (heredoc_body)
+                  (heredoc_end))))))))))
+
+==================
+missing heredoc terminator at eof
+==================
+cat <<EOF
+unterminated body
+---
+
+(source_file
+  (command_list
+    (and_or_command
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              (word
+                (identifier))
+              (redirection
+                (heredoc_redirect
+                  (redirect_operator)
+                  (heredoc_delimiter)
+                  (heredoc_body)
+                  (MISSING heredoc_end))))))))))
+
+==================
+second input heredoc is rejected
+==================
+cat <<FIRST <<SECOND
+FIRST
+SECOND
+---
+
+(source_file
+  (command_list
+    (and_or_command
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              (word
+                (identifier))
+              (redirection
+                (heredoc_redirect
+                  (redirect_operator)
+                  (heredoc_delimiter)
+                  (ERROR
+                    (heredoc_body)
+                    (heredoc_end))
+                  (MISSING heredoc_end)))
+              (word
+                (identifier)))))))))

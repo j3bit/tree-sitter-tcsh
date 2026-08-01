@@ -1,0 +1,285 @@
+==================
+structured substitutions and patterns
+==================
+echo $* $%name $< $?<
+echo ${name} ${1} ${?prompt} $?prompt
+echo $a[1-] $a[-2] $a[$lo-$hi]
+echo ${path:h} ${path}:h
+echo !!:2 !?text?:h !{event}:$
+echo !! !$ !:2
+echo $x:s/old/new/
+echo 'history !! survives' $'dollar\nquoted'
+echo `hostname` ! 'literal !'
+echo a{b,{c,d}}e ^temp* file[^0-9]
+echo *.c file[0-9].c {a,b}.c
+echo =0 =-/tail %?editor %1 %name
+^old^new^
+---
+
+(source_file
+  (command_list
+    (and_or_command
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              (word
+                (identifier))
+              (word
+                (variable_substitution
+                  (special_parameter)))
+              (word
+                (variable_substitution
+                  (special_parameter)
+                  (identifier)))
+              (word
+                (variable_substitution
+                  (special_parameter)))
+              (word
+                (variable_substitution
+                  (special_parameter)))))))))
+  (command_list
+    (and_or_command
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              (word
+                (identifier))
+              (word
+                (variable_substitution
+                  (identifier)))
+              (word
+                (variable_substitution
+                  (number)))
+              (word
+                (variable_substitution
+                  (special_parameter)
+                  (identifier)))
+              (word
+                (variable_substitution
+                  (special_parameter)
+                  (identifier)))))))))
+  (command_list
+    (and_or_command
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              (word
+                (identifier))
+              (word
+                (variable_substitution
+                  (identifier)
+                  (subscript
+                    (selector_index
+                      (number)))))
+              (word
+                (variable_substitution
+                  (identifier)
+                  (subscript
+                    (selector_index
+                      (number)))))
+              (word
+                (variable_substitution
+                  (identifier)
+                  (subscript
+                    (selector_index
+                      (identifier))
+                    (selector_index
+                      (identifier)))))))))))
+  (command_list
+    (and_or_command
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              (word
+                (identifier))
+              (word
+                (variable_substitution
+                  (identifier)
+                  (substitution_modifier)))
+              (word
+                (variable_substitution
+                  (identifier))
+                (bare_word))))))))
+  (command_list
+    (and_or_command
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              (word
+                (identifier))
+              (word
+                (history_substitution
+                  (history_event
+                    (history_event_name))
+                  (history_word_designator)))
+              (word
+                (history_substitution
+                  (history_event
+                    (history_search))
+                  (history_modifier)))
+              (word
+                (history_substitution
+                  (history_event
+                    (history_event_name))
+                  (history_word_designator)))))))))
+  (command_list
+    (and_or_command
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              (word
+                (identifier))
+              (word
+                (history_substitution
+                  (history_event
+                    (history_event_name))))
+              (word
+                (history_substitution
+                  (history_word_designator)))
+              (word
+                (history_substitution
+                  (history_word_designator)))))))))
+  (command_list
+    (and_or_command
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              (word
+                (identifier))
+              (word
+                (variable_substitution
+                  (identifier)
+                  (substitution_modifier)))))))))
+  (command_list
+    (and_or_command
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              (word
+                (identifier))
+              (word
+                (single_quoted_string
+                  (history_substitution
+                    (history_event
+                      (history_event_name)))))
+              (word
+                (dollar_single_quoted_string
+                  (literal_dollar)))))))))
+  (command_list
+    (and_or_command
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              (word
+                (identifier)
+                (backtick_command_substitution
+                  (command_list
+                    (and_or_command
+                      (and_command
+                        (pipeline
+                          (command
+                            (simple_command
+                              (word
+                                (identifier))))))))))
+              (word
+                (literal_bang))
+              (word
+                (single_quoted_string
+                  (literal_bang)))))))))
+  (command_list
+    (and_or_command
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              (word
+                (identifier))
+              (word
+                (glob_pattern
+                  (brace_pattern)))
+              (word
+                (glob_pattern))
+              (word
+                (glob_pattern))))))))
+  (command_list
+    (and_or_command
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              (word
+                (identifier))
+              (word
+                (glob_pattern))
+              (word
+                (glob_pattern))
+              (word
+                (glob_pattern
+                  (brace_pattern)))))))))
+  (command_list
+    (and_or_command
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              (word
+                (identifier))
+              (word
+                (directory_stack_reference))
+              (word
+                (directory_stack_reference)
+                (bare_word))
+              (word
+                (job_spec))
+              (word
+                (job_spec))
+              (word
+                (job_spec))))))))
+  (quick_substitution_statement
+    (substitution_lhs)
+    (substitution_rhs)))
+
+==================
+incomplete selectors and modifiers stay visible
+==================
+echo $a[] $a[-] $x:Z $x:s/old
+---
+
+(source_file
+  (command_list
+    (and_or_command
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              (word
+                (identifier))
+              (word
+                (variable_substitution
+                  (identifier)
+                  (subscript
+                    (selector_index
+                      (MISSING number)))))
+              (word
+                (variable_substitution
+                  (identifier)
+                  (subscript
+                    (selector_index
+                      (MISSING number)))))
+              (word
+                (variable_substitution
+                  (identifier))
+                (bare_word))
+              (word
+                (variable_substitution
+                  (identifier))
+                (bare_word)))))))))
