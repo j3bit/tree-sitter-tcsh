@@ -3196,19 +3196,6 @@
         ]
       }
     },
-    "string": {
-      "type": "CHOICE",
-      "members": [
-        {
-          "type": "SYMBOL",
-          "name": "single_quoted_string"
-        },
-        {
-          "type": "SYMBOL",
-          "name": "double_quoted_string"
-        }
-      ]
-    },
     "single_quoted_string": {
       "type": "SEQ",
       "members": [
