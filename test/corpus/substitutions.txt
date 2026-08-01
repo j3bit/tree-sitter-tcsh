@@ -204,8 +204,13 @@ echo =0 =-/tail %?editor %1 %name
               (word
                 (identifier))
               (word
-                (glob_pattern
-                  (brace_pattern)))
+                (identifier)
+                (brace_pattern
+                  (bare_word)
+                  (brace_pattern
+                    (bare_word)
+                    (bare_word)))
+                (bare_word))
               (word
                 (glob_pattern))
               (word
@@ -223,8 +228,10 @@ echo =0 =-/tail %?editor %1 %name
               (word
                 (glob_pattern))
               (word
-                (glob_pattern
-                  (brace_pattern)))))))))
+                (brace_pattern
+                  (bare_word)
+                  (bare_word))
+                (bare_word))))))))
   (command_list
     (and_or_command
       (and_command

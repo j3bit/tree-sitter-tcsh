@@ -15,9 +15,9 @@ const PREC = {
   PREFIX: 13,
 };
 
-function immediateWordFragment($, includeLiteralBang) {
+function immediateWordFragment($, includeLiteralBang, bareWordPattern = /[^\s#;|&<>(){}'"`$!\\*?\[\]%]+/) {
   return choice(
-    alias(token.immediate(/[^\s#;|&<>(){}'"`$!\\*?\[\]%]+/), $.bare_word),
+    alias(token.immediate(bareWordPattern), $.bare_word),
     alias(token.immediate(seq('\\', /(.|\r?\n)/)), $.escape_sequence),
     alias($._immediate_single_quoted_string, $.single_quoted_string),
     alias($._immediate_dollar_single_quoted_string, $.dollar_single_quoted_string),
@@ -26,9 +26,22 @@ function immediateWordFragment($, includeLiteralBang) {
     alias($._immediate_variable_substitution, $.variable_substitution),
     alias($._immediate_history_substitution, $.history_substitution),
     ...(includeLiteralBang ? [alias(token.immediate('!'), $.literal_bang)] : []),
+    alias($._immediate_brace_pattern, $.brace_pattern),
     alias(token.immediate(/\^?[A-Za-z0-9_.\/-]*([*?]|\[[^\]\s\n]+\])[A-Za-z0-9_.\/*?\[\]-]*/), $.glob_pattern),
     alias(token.immediate(/=(?:[0-9]+|-)/), $.directory_stack_reference),
     alias(token.immediate(seq('%', choice('%', '+', '-', /[0-9]+/, seq('?', /[^\s;|&<>(){}'"`]+/), /[A-Za-z_][A-Za-z0-9_-]*/))), $.job_spec),
+  );
+}
+
+function bracePattern($, openingBrace) {
+  return seq(
+    openingBrace,
+    optional($._brace_alternative),
+    repeat1(seq(
+      token.immediate(','),
+      optional($._brace_alternative),
+    )),
+    token.immediate('}'),
   );
 }
 
@@ -362,12 +375,20 @@ module.exports = grammar({
       $.literal_dollar,
       $.history_substitution,
       $.literal_bang,
+      $.brace_pattern,
       $.glob_pattern,
       $.directory_stack_reference,
       $.job_spec,
     ),
 
     _immediate_word_fragment: $ => immediateWordFragment($, true),
+
+    _brace_alternative: $ => repeat1(immediateWordFragment(
+      $,
+      true,
+      /[^,\s#;|&<>(){}'"`$!\\*?\[\]%]+/,
+    )),
+    _immediate_brace_pattern: $ => bracePattern($, token.immediate('{')),
 
     bare_word: _ => token(prec(-1, /[^\s#;|&<>(){}'"`$!\\*?\[\]%]+/)),
     identifier: _ => /[A-Za-z_][A-Za-z0-9_]*/,
@@ -450,11 +471,8 @@ module.exports = grammar({
     history_modifier: _ => token.immediate(prec(5, /:(?:[ag]*(?:[htrueulqxp&]|s\/(?:\\.|[^/\n])*\/(?:\\.|[^/\n])*(?:\/)?))/)),
     history_event_name: _ => token.immediate(/[^\s:]+/),
     history_search: _ => token.immediate(/[^?\n]+/),
-    glob_pattern: $ => choice(
-      token(/\^?[A-Za-z0-9_.\/-]*([*?]|\[[^\]\s\n]+\])[A-Za-z0-9_.\/*?\[\]-]*/),
-      $.brace_pattern,
-    ),
-    brace_pattern: _ => token(prec(2, /[A-Za-z0-9_.\/-]*\{(?:[^,{}\s\n]+|\{[^{}\s\n]+\})(?:,(?:[^,{}\s\n]+|\{[^{}\s\n]+\}))+\}[A-Za-z0-9_.\/-]*/)),
+    glob_pattern: _ => token(/\^?[A-Za-z0-9_.\/-]*([*?]|\[[^\]\s\n]+\])[A-Za-z0-9_.\/*?\[\]-]*/),
+    brace_pattern: $ => bracePattern($, '{'),
     directory_stack_reference: _ => token(/=(?:[0-9]+|-)/),
     job_spec: _ => token(seq('%', choice('%', '+', '-', /[0-9]+/, seq('?', /[^\s;|&<>(){}'"`]+/), /[A-Za-z_][A-Za-z0-9_-]*/))),
   }

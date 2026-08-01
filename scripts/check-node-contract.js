@@ -88,6 +88,7 @@ function requireChild(type, childType) {
   'subscript',
   'selector_index',
   'dollar_single_quoted_string',
+  'brace_pattern',
   'directory_stack_reference',
   'quick_substitution_statement',
 ].forEach(requireType);
@@ -132,6 +133,8 @@ requireFieldType('history_substitution', 'event', 'history_event');
 requireFieldType('history_substitution', 'designator', 'history_word_designator');
 requireFieldType('history_substitution', 'modifier', 'history_modifier');
 requireChild('source_target', 'word');
+requireChild('word', 'brace_pattern');
+requireChild('brace_pattern', 'brace_pattern');
 
 if (process.exitCode) process.exit(process.exitCode);
 console.log('node contract ok');
