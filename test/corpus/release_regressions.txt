@@ -246,3 +246,62 @@ endsw
     (default_clause
       (comment)
       (breaksw_statement))))
+
+==================
+release regressions: percent-bearing completion words
+==================
+complete -%* c/%/j/
+---
+
+(source_file
+  (command_list
+    (and_or_command
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              (word
+                (identifier))
+              (word
+                (bare_word)
+                (glob_pattern))
+              (word
+                (bare_word)))))))))
+
+==================
+release regressions: continued multiline backticks
+==================
+set hosts=( \
+  `echo \
+    one \
+  ` \
+)
+---
+
+(source_file
+  (command_list
+    (and_or_command
+      (and_command
+        (pipeline
+          (command
+            (set_statement
+              (set_command)
+              (set_assignment
+                (identifier)
+                (parenthesized_word_list
+                  (line_continuation)
+                  (word
+                    (backtick_command_substitution
+                      (command_list
+                        (and_or_command
+                          (and_command
+                            (pipeline
+                              (command
+                                (simple_command
+                                  (word
+                                    (identifier))
+                                  (line_continuation)
+                                  (word
+                                    (identifier))))))))
+                      (line_continuation)))
+                  (line_continuation))))))))))

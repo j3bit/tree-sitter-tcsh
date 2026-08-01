@@ -203,7 +203,7 @@ int main(void) {
   assert(backtick_state == 5);
   tree_sitter_tcsh_external_scanner_deserialize(scanner, serialized,
                                                 backtick_state);
-  MockLexer backtick_end = mock_lexer("`");
+  MockLexer backtick_end = mock_lexer("  `");
   assert(scan(scanner, &backtick_end, BACKTICK_END, BACKTICK_END));
   assert(backtick_end.lexer.result_symbol == BACKTICK_END);
 

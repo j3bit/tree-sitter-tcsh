@@ -17,6 +17,7 @@
     "check:coverage-matrix": "node scripts/check-coverage-matrix.js",
     "check:node-contract": "node scripts/check-node-contract.js",
     "check:no-error": "node scripts/check-no-error.js",
+    "check:upstream": "node scripts/check-upstream-samples.js",
     "check:static": "npm run check:node-contract && npm run check:scanner && npm run check:c-compile",
     "check:parser": "node scripts/check-parser-runtime.js",
     "check:parser:release": "node scripts/check-parser-runtime.js --release",

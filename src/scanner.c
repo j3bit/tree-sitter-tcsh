@@ -290,13 +290,18 @@ bool tree_sitter_tcsh_external_scanner_scan(void *payload, TSLexer *lexer,
       scanner->phase == PHASE_WAITING_FOR_DELIMITER) {
     return scan_heredoc_delimiter(scanner, lexer);
   }
-  if (valid_symbols[BACKTICK_END] && scanner->in_backtick &&
-      lexer->lookahead == '`') {
-    lexer->advance(lexer, false);
-    lexer->mark_end(lexer);
-    scanner->in_backtick = false;
-    lexer->result_symbol = BACKTICK_END;
-    return true;
+  if (valid_symbols[BACKTICK_END] && scanner->in_backtick) {
+    while (lexer->lookahead == ' ' || lexer->lookahead == '\t' ||
+           lexer->lookahead == '\r' || lexer->lookahead == '\f') {
+      lexer->advance(lexer, true);
+    }
+    if (lexer->lookahead == '`') {
+      lexer->advance(lexer, false);
+      lexer->mark_end(lexer);
+      scanner->in_backtick = false;
+      lexer->result_symbol = BACKTICK_END;
+      return true;
+    }
   }
   if (valid_symbols[QUICK_SUBSTITUTION_START] && lexer->get_column(lexer) == 0 &&
       lexer->lookahead == '^') {
