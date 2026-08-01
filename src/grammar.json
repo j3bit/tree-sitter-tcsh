@@ -1926,7 +1926,7 @@
                     "type": "IMMEDIATE_TOKEN",
                     "content": {
                       "type": "PATTERN",
-                      "value": "[^\\s#;|&<>(){}'\"`$!\\\\*?\\[\\]%]+"
+                      "value": "[^\\s#;|&<>(){}'\"`$!\\\\*?%]+"
                     }
                   },
                   "named": true,
@@ -3000,7 +3000,7 @@
             "type": "IMMEDIATE_TOKEN",
             "content": {
               "type": "PATTERN",
-              "value": "[^\\s#;|&<>(){}'\"`$!\\\\*?\\[\\]%]+"
+              "value": "[^\\s#;|&<>(){}'\"`$!\\\\*?%]+"
             }
           },
           "named": true,
@@ -3194,7 +3194,7 @@
               "type": "IMMEDIATE_TOKEN",
               "content": {
                 "type": "PATTERN",
-                "value": "[^,\\s#;|&<>(){}'\"`$!\\\\*?\\[\\]%]+"
+                "value": "[^,\\s#;|&<>(){}'\"`$!\\\\*?%]+"
               }
             },
             "named": true,
@@ -3443,7 +3443,7 @@
         "value": -1,
         "content": {
           "type": "PATTERN",
-          "value": "[^\\s#;|&<>(){}'\"`$!\\\\*?\\[\\]%]+"
+          "value": "[^\\s#;|&<>(){}'\"`$!\\\\*?%]+"
         }
       }
     },
