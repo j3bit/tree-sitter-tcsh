@@ -1,0 +1,86 @@
+==================
+release regressions: recursive brace words
+==================
+echo "$HOME/."{,r,ssh/known_}hosts*
+echo {-d,--{de,un}compress}
+echo a{b,{c,d}}e {a,b}.c
+echo pre"$USER"{left,{mid,{deep,down}tail}end}post*
+---
+
+(source_file
+  (command_list
+    (and_or_command
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              (word
+                (identifier))
+              (word
+                (double_quoted_string
+                  (variable_substitution
+                    (identifier)))
+                (brace_pattern
+                  (bare_word)
+                  (bare_word))
+                (glob_pattern))))))))
+  (command_list
+    (and_or_command
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              (word
+                (identifier))
+              (word
+                (brace_pattern
+                  (bare_word)
+                  (bare_word)
+                  (brace_pattern
+                    (bare_word)
+                    (bare_word))
+                  (bare_word)))))))))
+  (command_list
+    (and_or_command
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              (word
+                (identifier))
+              (word
+                (identifier)
+                (brace_pattern
+                  (bare_word)
+                  (brace_pattern
+                    (bare_word)
+                    (bare_word)))
+                (bare_word))
+              (word
+                (brace_pattern
+                  (bare_word)
+                  (bare_word))
+                (bare_word))))))))
+  (command_list
+    (and_or_command
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              (word
+                (identifier))
+              (word
+                (identifier)
+                (double_quoted_string
+                  (variable_substitution
+                    (identifier)))
+                (brace_pattern
+                  (bare_word)
+                  (brace_pattern
+                    (bare_word)
+                    (brace_pattern
+                      (bare_word)
+                      (bare_word))
+                    (bare_word))
+                  (bare_word))
+                (glob_pattern)))))))))

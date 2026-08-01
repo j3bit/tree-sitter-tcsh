@@ -120,8 +120,10 @@ echo 'single quoted' "double $USER !:1" `hostname` $argv[1-2] $?prompt !! !$ *.c
               (word
                 (glob_pattern))
               (word
-                (glob_pattern
-                  (brace_pattern)))
+                (brace_pattern
+                  (bare_word)
+                  (bare_word))
+                (bare_word))
               (word
                 (job_spec)))))))))
 

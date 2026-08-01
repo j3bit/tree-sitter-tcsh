@@ -37,6 +37,9 @@
 (backtick_command_substitution) @string.special
 (escape_sequence) @escape
 (history_substitution) @constant.macro
-(glob_pattern) @string.special
+[
+  (glob_pattern)
+  (brace_pattern)
+] @string.special
 (job_spec) @constant
 [(file_test_operator) (redirect_operator) (substitution_modifier)] @operator

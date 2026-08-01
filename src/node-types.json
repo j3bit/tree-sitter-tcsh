@@ -298,6 +298,69 @@
     }
   },
   {
+    "type": "brace_pattern",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "backtick_command_substitution",
+          "named": true
+        },
+        {
+          "type": "bare_word",
+          "named": true
+        },
+        {
+          "type": "brace_pattern",
+          "named": true
+        },
+        {
+          "type": "directory_stack_reference",
+          "named": true
+        },
+        {
+          "type": "dollar_single_quoted_string",
+          "named": true
+        },
+        {
+          "type": "double_quoted_string",
+          "named": true
+        },
+        {
+          "type": "escape_sequence",
+          "named": true
+        },
+        {
+          "type": "glob_pattern",
+          "named": true
+        },
+        {
+          "type": "history_substitution",
+          "named": true
+        },
+        {
+          "type": "job_spec",
+          "named": true
+        },
+        {
+          "type": "literal_bang",
+          "named": true
+        },
+        {
+          "type": "single_quoted_string",
+          "named": true
+        },
+        {
+          "type": "variable_substitution",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "case_clause",
     "named": true,
     "fields": {
@@ -948,21 +1011,6 @@
           }
         ]
       }
-    }
-  },
-  {
-    "type": "glob_pattern",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": false,
-      "required": false,
-      "types": [
-        {
-          "type": "brace_pattern",
-          "named": true
-        }
-      ]
     }
   },
   {
@@ -2087,6 +2135,10 @@
           "named": true
         },
         {
+          "type": "brace_pattern",
+          "named": true
+        },
+        {
           "type": "directory_stack_reference",
           "named": true
         },
@@ -2210,6 +2262,10 @@
     "named": false
   },
   {
+    "type": ",",
+    "named": false
+  },
+  {
     "type": "-",
     "named": false
   },
@@ -2306,10 +2362,6 @@
     "named": true
   },
   {
-    "type": "brace_pattern",
-    "named": true
-  },
-  {
     "type": "break_statement",
     "named": true
   },
@@ -2368,6 +2420,10 @@
   {
     "type": "foreach",
     "named": false
+  },
+  {
+    "type": "glob_pattern",
+    "named": true
   },
   {
     "type": "goto",
