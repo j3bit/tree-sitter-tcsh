@@ -126,7 +126,7 @@ void tree_sitter_tcsh_external_scanner_deserialize(void *payload,
       ((phase == PHASE_WAITING_FOR_BODY || phase == PHASE_WAITING_FOR_END) &&
        delimiter_length == 0) ||
       (phase == PHASE_IDLE && !in_backtick) ||
-      length != SERIALIZATION_HEADER_SIZE + delimiter_length) {
+      length != (unsigned)SERIALIZATION_HEADER_SIZE + delimiter_length) {
     return;
   }
 
