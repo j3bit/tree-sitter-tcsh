@@ -23,8 +23,8 @@
 ] @function.builtin
 
 (simple_command
-  name: (word (identifier) @function.builtin)
-  (#match? @function.builtin "^(alias|bg|bindkey|break|breaksw|builtins|bye|cd|chdir|complete|continue|dirs|echo|echotc|eval|exec|exit|fg|filetest|glob|goto|hashstat|history|hup|jobs|kill|limit|login|logout|nice|nohup|notify|onintr|popd|printenv|pushd|rehash|repeat|sched|set|setenv|shift|source|stop|suspend|switch|time|umask|unalias|uncomplete|unhash|unlimit|unset|unsetenv|wait|where|which|while)$"))
+  name: (word) @function.builtin
+  (#match? @function.builtin "^(:|alloc|bg|bindkey|bs2cmd|builtins|bye|cd|chdir|complete|dirs|echo|echotc|eval|exec|fg|filetest|getspath|getxvers|glob|hashstat|history|hup|inlib|jobs|kill|limit|log|login|logout|ls-F|migrate|newgrp|nice|nohup|notify|popd|printenv|pushd|rehash|rootnode|sched|setenv|setpath|setspath|settc|setty|setxvers|shift|stop|suspend|telltc|termname|time|umask|unalias|uncomplete|unhash|universe|unlimit|unset|unsetenv|ver|wait|warp|where|which)$"))
 
 (label name: (label_name) @label)
 (goto_statement target: (word) @label)
@@ -42,4 +42,19 @@
   (brace_pattern)
 ] @string.special
 (job_spec) @constant
-[(file_test_operator) (redirect_operator) (substitution_modifier)] @operator
+(binary_expression
+  operator: [
+    "||" "&&" "|" "^" "&"
+    "==" "!=" "=~" "!~"
+    "<" "<=" ">" ">="
+    "<<" ">>" "+" "-" "*" "/" "%"
+  ] @operator)
+(unary_expression operator: ["!" "~" "+" "-"] @operator)
+[
+  (assignment_operator)
+  (update_operator)
+  (file_test_operator)
+  (redirect_operator)
+  (substitution_modifier)
+  (history_modifier)
+] @operator

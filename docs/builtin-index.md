@@ -12,6 +12,24 @@ This manually audited initial index is derived from the tcsh manual builtins sec
 | simple command-word builtins not otherwise listed | TC-BLT-999 | covered by `simple_command`; runtime effects are out of scope |
 
 
-## Additional audited manual entries covered generically
+## Highlight query contract
 
-The following documented builtin/form entries are present in `test/corpus/surface_syntax.txt` and matrix rows `TC-BLT-042` onward. They are parsed by `simple_command` plus `word`/`job_spec`/redirection syntax because their parser-readable surface is command-word oriented in the grammar scope: `%job`, `:`, alloc, bs2cmd, builtins, bye, echotc, filetest, getspath, getxvers, hup, inlib, jobs -Z, kill -l, kill -s, log, ls-F, migrate, newgrp, notify, printenv, rootnode, setpath, setspath, settc, setty, setxvers, stop, suspend, telltc, termname, unhash, universe, ver, and warp. `printf`, `return`, and `.` are deliberately not classified as tcsh builtins. Runtime effects remain out of scope.
+Specialized command nodes capture `alias`, `set`, `source`, and `exit` as
+`@function.builtin`. Control-flow forms remain `@keyword`. The ordinary
+command-position query matches the complete static `word` for exactly these
+audited names:
+
+`:`; `alloc`; `bg`; `bindkey`; `bs2cmd`; `builtins`; `bye`; `cd`; `chdir`;
+`complete`; `dirs`; `echo`; `echotc`; `eval`; `exec`; `fg`; `filetest`;
+`getspath`; `getxvers`; `glob`; `hashstat`; `history`; `hup`; `inlib`; `jobs`;
+`kill`; `limit`; `log`; `login`; `logout`; `ls-F`; `migrate`; `newgrp`; `nice`;
+`nohup`; `notify`; `popd`; `printenv`; `pushd`; `rehash`; `rootnode`; `sched`;
+`setenv`; `setpath`; `setspath`; `settc`; `setty`; `setxvers`; `shift`; `stop`;
+`suspend`; `telltc`; `termname`; `time`; `umask`; `unalias`; `uncomplete`;
+`unhash`; `universe`; `unlimit`; `unset`; `unsetenv`; `ver`; `wait`; `warp`;
+`where`; and `which`.
+
+`%job` remains a `job_spec` capture rather than a static builtin name. Options
+such as `jobs -Z` and `kill -l`/`-s` do not change command-name classification.
+`printf`, `return`, and `.` are deliberately not classified as tcsh builtins.
+Runtime effects remain out of scope.
