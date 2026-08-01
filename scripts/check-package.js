@@ -11,6 +11,23 @@ function words(command, args) {
   return execFileSync(command, args, { encoding: 'utf8' }).trim().split(/\s+/).filter(Boolean);
 }
 
+function compileAndRun(packageRoot, directory, source, name) {
+  const executable = path.join(directory, name);
+  const compilerArgs = [
+    '-std=c11', '-Wall', '-Wextra', '-Werror',
+    ...words('pkg-config', ['--cflags', 'tree-sitter']),
+    `-I${path.join(packageRoot, 'bindings/c')}`,
+    `-I${path.join(packageRoot, 'src')}`,
+    source,
+    path.join(packageRoot, 'src/parser.c'),
+    path.join(packageRoot, 'src/scanner.c'),
+    ...words('pkg-config', ['--libs', 'tree-sitter']),
+    '-o', executable,
+  ];
+  execFileSync('cc', compilerArgs, { stdio: 'inherit' });
+  execFileSync(executable, [], { stdio: 'inherit' });
+}
+
 try {
   const packed = JSON.parse(execFileSync('npm', [
     'pack', '--json', '--pack-destination', directory,
@@ -41,21 +58,14 @@ try {
     throw new Error('C-only package must not contain binding.gyp');
   }
 
-  const executable = path.join(directory, 'consumer');
-  const compilerArgs = [
-    '-std=c11', '-Wall', '-Wextra', '-Werror',
-    ...words('pkg-config', ['--cflags', 'tree-sitter']),
-    `-I${path.join(packageRoot, 'bindings/c')}`,
-    `-I${path.join(packageRoot, 'src')}`,
-    'test/c_consumer.c',
-    path.join(packageRoot, 'src/parser.c'),
-    path.join(packageRoot, 'src/scanner.c'),
-    ...words('pkg-config', ['--libs', 'tree-sitter']),
-    '-o', executable,
-  ];
-  execFileSync('cc', compilerArgs, { stdio: 'inherit' });
-  execFileSync(executable, [], { stdio: 'inherit' });
-  console.log('packed C consumer ok');
+  compileAndRun(packageRoot, directory, 'test/c_consumer.c', 'consumer');
+  compileAndRun(
+    packageRoot,
+    directory,
+    'test/c_included_ranges.c',
+    'included-ranges',
+  );
+  console.log('packed C consumers ok');
 } finally {
   fs.rmSync(directory, { recursive: true, force: true });
 }

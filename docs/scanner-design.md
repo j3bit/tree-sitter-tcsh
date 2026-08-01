@@ -165,6 +165,9 @@ Rules:
   heredoc branch.
 - On deserialization or included-range re-entry, use only serialized state; do
   not depend on process-global or previous-parser state.
+- `test/c_included_ranges.c` verifies the real `ts_parser_set_included_ranges`
+  contract for complete and partial heredoc visibility, disjoint ordinary
+  ranges, and incremental edits to every heredoc component.
 - A range that begins inside a body may expose a body/error node but must never
   synthesize a delimiter from bytes outside the range.
 - Incremental edits to the operator, delimiter, body, or terminator must
