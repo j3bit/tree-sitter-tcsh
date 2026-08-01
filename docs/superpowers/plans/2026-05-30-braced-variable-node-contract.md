@@ -1,5 +1,8 @@
 # Braced Variable Node Contract Implementation Plan
 
+**Status:** Completed in `5392785`. Superseded as an active roadmap by the
+[stable release readiness plan](./2026-08-01-tree-sitter-tcsh-stable-release-readiness.md).
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Make braced variable substitutions such as `${foo}` and `${ROOT}/env.csh` expose parser-owned variable-name nodes that `tcsh-lsp` can consume without string slicing.

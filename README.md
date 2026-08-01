@@ -2,7 +2,11 @@
 
 [![CI](https://github.com/j3bit/tree-sitter-tcsh/actions/workflows/ci.yml/badge.svg)](https://github.com/j3bit/tree-sitter-tcsh/actions/workflows/ci.yml)
 
-A Tree-sitter grammar for documented `tcsh`/`csh` surface syntax. The grammar is intended for editor tooling, syntax highlighting, code navigation, and structural parsing. It does **not** execute shell semantics.
+A Tree-sitter grammar for documented `tcsh`/`csh` surface syntax. The stable
+syntax reference is tcsh 6.24.16 (`TCSH6_24_16`, commit
+`f773aba56aa128a38712987b1b8bdbc393d1e4d0`). The grammar is intended for editor
+tooling, syntax highlighting, code navigation, and structural parsing. It does
+**not** execute shell semantics.
 
 ## Features
 
@@ -16,7 +20,11 @@ A Tree-sitter grammar for documented `tcsh`/`csh` surface syntax. The grammar is
 
 ## Scope and Non-goals
 
-This project parses syntax only. Runtime behavior is intentionally out of scope, including alias expansion, variable values, history/glob expansion results, job-control side effects, prompt rendering, and command execution.
+This project parses syntax only. Runtime behavior is intentionally out of scope,
+including alias expansion, variable values, history/glob expansion results,
+job-control side effects, prompt rendering, and command execution. Mutable
+lexical modes such as customized `histchars` are also outside the initial stable
+contract; the parser recognizes documented default-mode syntax.
 
 Rows marked `unsupported-with-reason` in the coverage matrix are allowed only for runtime-only semantics. Documented parser-readable syntax that cannot be parsed is treated as a release blocker.
 
@@ -82,9 +90,15 @@ npm run check:c-compile                  # compile the generated C parser
 npm run check:recovery                   # verify malformed-input recovery
 npm run check:stress                     # run large/incremental performance gates
 npm run check:package                    # pack and run a fresh C consumer
+npm run check:upstream -- --upstream-root /absolute/path/to/pinned/tcsh
 npm run check                            # run the development CI/local gate
 npm run check:release                    # require every parser-readable row to be release-green
 ```
+
+The upstream checkout must be tcsh commit
+`f773aba56aa128a38712987b1b8bdbc393d1e4d0`. The release checklist records the
+exact runtime, tag, artifact, and manual publication procedure in
+`docs/release-checklist.md`.
 
 After changing `grammar.js`, always run `npm run generate` and commit the updated generated files under `src/`.
 
@@ -98,6 +112,7 @@ queries/                           highlights, locals, tags, and folds queries
 docs/syntax-coverage-matrix.md      release-blocking syntax coverage matrix
 docs/scanner-design.md              external scanner admission gate
 docs/reference-ledger.md            reference and provenance policy
+docs/release-checklist.md           stable tag and publication procedure
 examples/                           parser smoke and showcase scripts
 scripts/                            validation helpers
 ```
