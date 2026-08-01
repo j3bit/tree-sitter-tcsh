@@ -941,6 +941,27 @@
         "value": "\\r?\\n"
       }
     },
+    "_block_header_end": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "comment"
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        },
+        {
+          "type": "SYMBOL",
+          "name": "_newline"
+        }
+      ]
+    },
     "_block_line": {
       "type": "CHOICE",
       "members": [
@@ -1056,7 +1077,7 @@
           },
           {
             "type": "SYMBOL",
-            "name": "_newline"
+            "name": "_block_header_end"
           },
           {
             "type": "REPEAT",
@@ -1195,7 +1216,7 @@
             },
             {
               "type": "SYMBOL",
-              "name": "_newline"
+              "name": "_block_header_end"
             },
             {
               "type": "REPEAT",
@@ -1227,7 +1248,7 @@
             },
             {
               "type": "SYMBOL",
-              "name": "_newline"
+              "name": "_block_header_end"
             },
             {
               "type": "REPEAT",
@@ -1280,7 +1301,7 @@
         },
         {
           "type": "SYMBOL",
-          "name": "_newline"
+          "name": "_block_header_end"
         },
         {
           "type": "REPEAT",
@@ -1332,7 +1353,7 @@
         },
         {
           "type": "SYMBOL",
-          "name": "_newline"
+          "name": "_block_header_end"
         },
         {
           "type": "REPEAT",
@@ -1384,7 +1405,7 @@
         },
         {
           "type": "SYMBOL",
-          "name": "_newline"
+          "name": "_block_header_end"
         },
         {
           "type": "REPEAT",
@@ -1443,7 +1464,7 @@
           },
           {
             "type": "SYMBOL",
-            "name": "_newline"
+            "name": "_block_header_end"
           },
           {
             "type": "REPEAT",
@@ -1474,7 +1495,7 @@
           },
           {
             "type": "SYMBOL",
-            "name": "_newline"
+            "name": "_block_header_end"
           },
           {
             "type": "REPEAT",

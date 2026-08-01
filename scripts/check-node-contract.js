@@ -135,6 +135,16 @@ requireFieldType('history_substitution', 'modifier', 'history_modifier');
 requireChild('source_target', 'word');
 requireChild('word', 'brace_pattern');
 requireChild('brace_pattern', 'brace_pattern');
+[
+  'if_statement',
+  'else_if_clause',
+  'else_clause',
+  'foreach_statement',
+  'while_statement',
+  'switch_statement',
+  'case_clause',
+  'default_clause',
+].forEach((type) => requireChild(type, 'comment'));
 
 if (process.exitCode) process.exit(process.exitCode);
 console.log('node contract ok');
