@@ -33,7 +33,7 @@ The initial `externals` order is part of the generated-language contract:
 | `literal_bang` | yes, implemented | Emit `!` as literal only when the following byte cannot begin a documented history reference. It carries no state. |
 | `label_name` | yes, implemented | Emit a numeric, dotted, hyphenated, or identifier-like name only when the next byte is the required immediate label colon. |
 | `_backtick_start` | yes, implemented | Emit an opening backtick and enter command-substitution state. |
-| `_backtick_end` | yes, implemented | Emit a closing backtick only in a parser state that expects the end of a structured command substitution. |
+| `_backtick_end` | yes, implemented | Emit a closing backtick only in a parser state that expects the end of a structured command substitution, skipping horizontal indentation after a line continuation. |
 | `redirect_operator` | yes, implemented | Emit only documented complete input/output operators. Share the `<` lookahead branch with `_heredoc_operator` so `<` and `<<` cannot mask one another, and reject `<<` before an invalid delimiter starter. |
 | `_quick_substitution_start` | yes, implemented | Emit the first `^` only at column zero when another `^` exists on the line, preventing the longest generic word token from hiding quick substitution syntax. |
 | `_at_prefix` | yes, implemented | Emit `@` only when it is followed by required horizontal whitespace and a non-empty assignment/update form. It carries no state. |
@@ -154,6 +154,8 @@ Rules:
 - A missing terminator at EOF may emit the remaining non-empty body once, after
   which scanning fails and lets the grammar recover with a missing/error node.
 - No successful scan may leave the lexer at its starting byte.
+- A closing backtick may follow skipped horizontal indentation on a continued
+  logical line; the indentation is not part of the delimiter token.
 - Scanner logging and assertions must not be required for progress.
 
 ## Error recovery and included ranges

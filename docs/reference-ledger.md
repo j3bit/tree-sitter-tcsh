@@ -24,3 +24,29 @@ This repository targets documented **surface syntax** for tcsh/csh. It parses sy
 ## Provenance policy
 
 Implementation is clean-room by default. Third-party grammar code is not copied unless a future change records license, exact commit, copied files, and rationale.
+
+## Pinned upstream sample audit
+
+The release audit uses the tcsh 6.24.16 tag `TCSH6_24_16` at commit
+`f773aba56aa128a38712987b1b8bdbc393d1e4d0`. The independently implemented
+gate parses these nine upstream files without copying or executing them:
+
+- `complete.tcsh`
+- `dot.tcshrc`
+- `dot.login`
+- `cygwin/bindkey.tcsh`
+- `cygwin/csh.cshrc`
+- `cygwin/csh.login`
+- `debian/csh.cshrc`
+- `debian/csh.login`
+- `win32/example.tcshrc`
+
+The 2026-07-31 baseline audit passed six of nine files. `complete.tcsh`,
+`dot.tcshrc`, and `win32/example.tcshrc` exposed independently reduced grammar
+regressions in brace composition, literal bracket and percent-bearing words,
+block-header comments, and continued multiline backticks. Only the reduced,
+independently authored fixtures are committed to this repository.
+
+The 2026-08-02 audit passes all nine files. Run it against an existing pinned
+checkout with
+`npm run check:upstream -- --upstream-root /absolute/path/to/tcsh`.
