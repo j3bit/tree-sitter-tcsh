@@ -131,3 +131,118 @@ echo file[abc file]
               (word
                 (identifier)
                 (bare_word)))))))))
+
+==================
+release regressions: comments on block headers
+==================
+if (! $?prompt) then # if header
+  echo interactive
+else if (0) then # else-if header
+  echo no
+else # else header
+  echo fallback
+endif
+foreach item (one two) # foreach header
+  echo $item
+end
+while (0) # while header
+  echo never
+end
+switch (x) # switch header
+case x: # case header
+  breaksw
+default: # default header
+  breaksw
+endsw
+---
+
+(source_file
+  (if_statement
+    (expression
+      (unary_expression
+        (expression
+          (word
+            (variable_substitution
+              (special_parameter)
+              (identifier))))))
+    (comment)
+    (command_list
+      (and_or_command
+        (and_command
+          (pipeline
+            (command
+              (simple_command
+                (word
+                  (identifier))
+                (word
+                  (identifier))))))))
+    (else_if_clause
+      (expression
+        (number))
+      (comment)
+      (command_list
+        (and_or_command
+          (and_command
+            (pipeline
+              (command
+                (simple_command
+                  (word
+                    (identifier))
+                  (word
+                    (identifier)))))))))
+    (else_clause
+      (comment)
+      (command_list
+        (and_or_command
+          (and_command
+            (pipeline
+              (command
+                (simple_command
+                  (word
+                    (identifier))
+                  (word
+                    (identifier))))))))))
+  (foreach_statement
+    (identifier)
+    (word
+      (identifier))
+    (word
+      (identifier))
+    (comment)
+    (command_list
+      (and_or_command
+        (and_command
+          (pipeline
+            (command
+              (simple_command
+                (word
+                  (identifier))
+                (word
+                  (variable_substitution
+                    (identifier))))))))))
+  (while_statement
+    (expression
+      (number))
+    (comment)
+    (command_list
+      (and_or_command
+        (and_command
+          (pipeline
+            (command
+              (simple_command
+                (word
+                  (identifier))
+                (word
+                  (identifier)))))))))
+  (switch_statement
+    (word
+      (identifier))
+    (comment)
+    (case_clause
+      (word
+        (identifier))
+      (comment)
+      (breaksw_statement))
+    (default_clause
+      (comment)
+      (breaksw_statement))))

@@ -214,6 +214,7 @@ module.exports = grammar({
       field('end', $.heredoc_end),
     ),
     _newline: _ => token(/\r?\n/),
+    _block_header_end: $ => seq(optional($.comment), $._newline),
     _block_line: $ => choice(
       $._newline,
       seq($.comment, $._newline),
@@ -227,7 +228,7 @@ module.exports = grammar({
     ),
 
     if_statement: $ => prec.right(seq(
-      'if', '(', optional(field('condition', $.expression)), ')', 'then', $._newline,
+      'if', '(', optional(field('condition', $.expression)), ')', 'then', $._block_header_end,
       repeat(field('body', $._block_line)),
       repeat(field('alternative', $.else_if_clause)),
       optional(field('alternative', $.else_clause)),
@@ -238,35 +239,35 @@ module.exports = grammar({
       field('body', $.command),
     )),
     else_if_clause: $ => prec(2, prec.right(seq(
-      'else', 'if', '(', optional(field('condition', $.expression)), ')', 'then', $._newline,
+      'else', 'if', '(', optional(field('condition', $.expression)), ')', 'then', $._block_header_end,
       repeat(field('body', $._block_line)),
     ))),
     else_clause: $ => prec(1, prec.right(seq(
-      'else', $._newline,
+      'else', $._block_header_end,
       repeat(field('body', $._block_line)),
     ))),
 
     foreach_statement: $ => seq(
-      'foreach', field('variable', $.identifier), '(', repeat(field('subject', $.word)), ')', $._newline,
+      'foreach', field('variable', $.identifier), '(', repeat(field('subject', $.word)), ')', $._block_header_end,
       repeat(field('body', $._block_line)),
       'end',
     ),
     while_statement: $ => seq(
-      'while', '(', optional(field('condition', $.expression)), ')', $._newline,
+      'while', '(', optional(field('condition', $.expression)), ')', $._block_header_end,
       repeat(field('body', $._block_line)),
       'end',
     ),
     switch_statement: $ => seq(
-      'switch', '(', optional(field('subject', $.word)), ')', $._newline,
+      'switch', '(', optional(field('subject', $.word)), ')', $._block_header_end,
       repeat(field('body', choice($.case_clause, $.default_clause, $._block_line))),
       'endsw',
     ),
     case_clause: $ => prec.right(seq(
-      'case', field('pattern', $.word), token.immediate(':'), $._newline,
+      'case', field('pattern', $.word), token.immediate(':'), $._block_header_end,
       repeat($._block_line),
     )),
     default_clause: $ => prec.right(seq(
-      'default', token.immediate(':'), $._newline,
+      'default', token.immediate(':'), $._block_header_end,
       repeat($._block_line),
     )),
     repeat_statement: $ => prec.right(seq(
