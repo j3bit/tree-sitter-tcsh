@@ -93,6 +93,7 @@ function verifyPackageContract() {
     'docs/builtin-index.md',
     'docs/feature-plan.md',
     'docs/reference-ledger.md',
+    'docs/release-checklist.md',
     'docs/scanner-design.md',
     'docs/syntax-coverage-matrix.md',
     'LICENSE',

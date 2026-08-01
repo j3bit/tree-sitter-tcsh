@@ -1,9 +1,15 @@
 # Parser Correctness and Release Feature Plan
 
-- Status: implemented; release gates added
+- Status: completed in `6d00f66`; distribution and stable-release remediation
+  completed through `57ccfeb`
 - Parser audit baseline: `5392785` on 2026-07-31
 - Target reference: documented tcsh 6.24.16 surface syntax
 - Initial distribution decision: C-only
+
+The active release procedure is
+[the stable release checklist](./release-checklist.md). The implementation
+sequence and evidence are retained in
+[the stable release readiness plan](./superpowers/plans/2026-08-01-tree-sitter-tcsh-stable-release-readiness.md).
 
 ## Goal
 
@@ -18,29 +24,22 @@ comparison. Bash-only syntax is not a tcsh requirement, and no third-party
 grammar or scanner code is to be copied without the provenance update required
 by [the reference ledger](./reference-ledger.md).
 
-## Current baseline
+## Implemented baseline
 
 The generated parser is synchronized with `grammar.js`, compiles as C11, exports
-the expected Tree-sitter language symbol, and parses large and deeply nested
-inputs without crashes or pathological scaling. Those properties should be
-preserved.
+the expected Tree-sitter language symbol, and passes large, deeply nested, and
+representative incremental parsing gates. Logical word composition, opaque
+heredoc attachment, source boundaries, builtin classification, exported CST
+fields, recovery, and position-sensitive editor query contracts have structural
+fixtures. The release coverage matrix has no parser-readable row left at
+`implemented`.
 
-The current documented coverage claims are nevertheless too optimistic:
-
-- A logical shell word is represented as one fragment rather than a composition
-  of adjacent literal, quoted, escaped, and substituted fragments.
-- Here-document bodies are parsed as ordinary tcsh commands and can silently
-  change an enclosing control-flow tree.
-- Valid source forms can produce `ERROR`, while invalid forms can produce a clean
-  high-level node.
-- Successful parses can expose the wrong argument count, variable reference,
-  label, source target, or builtin classification.
-- Query files compile, but their captures do not consistently describe the CST.
-- The declared C-only binding scope and the included, non-functional Node build
-  metadata do not form a coherent distribution contract.
-- [The syntax coverage matrix](./syntax-coverage-matrix.md) marks several of
-  these behaviors `tested`, so the current release gate does not express actual
-  parser correctness.
+The C-only package installs through Make or CMake, provides a canonical public
+header and pkg-config metadata, and is exercised by a fresh installed consumer.
+Pull-request CI runs the publication-equivalent release gate on Ubuntu and
+macOS, while a separate job parses nine pinned tcsh 6.24.16 samples. The tag
+workflow verifies metadata, performs an npm publication dry run, and uploads the
+verified tarball without publishing it automatically.
 
 The following plans record earlier consumer-contract work and remain useful
 history, but they are not syntax oracles for this roadmap:
@@ -49,9 +48,8 @@ history, but they are not syntax oracles for this roadmap:
 - [tcsh-lsp vendor contract closure](./superpowers/plans/2026-05-29-tcsh-lsp-vendor-contract-closure.md)
 - [Braced variable node contract](./superpowers/plans/2026-05-30-braced-variable-node-contract.md)
 
-P0 may correct syntax assumptions in those plans. Valid consumer-facing fields
-must either be preserved through the rebuild or changed through one explicit,
-versioned CST migration.
+Later parser work preserved or explicitly tested the consumer-facing fields
+introduced by those plans.
 
 ## Product scope
 

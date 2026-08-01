@@ -1,5 +1,8 @@
 # Tree Sitter Tcsh Switch and Source Structure Implementation Plan
 
+**Status:** Completed in `9500494`. Superseded as an active roadmap by the
+[stable release readiness plan](./2026-08-01-tree-sitter-tcsh-stable-release-readiness.md).
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Make `tree-sitter-tcsh` provide parser-owned syntax facts for switch clause bodies and source targets without adding tcsh-lsp-side parser heuristics.

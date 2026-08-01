@@ -1,5 +1,9 @@
 # Tree-sitter tcsh P0-P2 Performance and Cleanup Implementation Plan
 
+**Status:** Completed in `d5bf612`, `a54c78f`, `cd1b041`, `8f1a46e`, and
+`c547e90`. Superseded as an active roadmap by the
+[stable release readiness plan](./2026-08-01-tree-sitter-tcsh-stable-release-readiness.md).
+
 **Goal:** Preserve every parser-visible tcsh behavior while making the validation pipeline materially faster, adding a representative incremental-performance regression gate, and removing proven grammar ambiguity, duplication, and dead declarations.
 
 **Architecture:** Keep `grammar.js` as the sole syntax source of truth and keep all public CST, query, recovery, scanner, and package contracts unchanged. P0 introduces one validation composition root that builds a parser library once and passes that library to the existing checks. P1 applies two independently verifiable grammar refactors. P2 removes declarations that have no generated-parser or public-node effect. Every grammar step has a stricter artifact-diff allowance than the general test suite.

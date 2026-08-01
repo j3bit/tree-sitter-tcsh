@@ -1,8 +1,13 @@
 # Tree-sitter tcsh Stable 0.1.0 Release Readiness Plan
 
-**Status:** Proposed
+**Status:** Repository implementation complete through `57ccfeb`; branch
+protection, tag creation, and registry publication remain maintainer actions.
 
 **Baseline:** `1d7243d8d5a4b54e48221d6b660be2de97ac550d` on 2026-08-01
+
+**Implementation commits:** `2a77cab`, `e575c63`, `d283907`, `cc51d0a`,
+`442570f`, `b202632`, `4220be9`, `819e5c8`, and `57ccfeb`. Final documentation
+and the operator procedure live in `docs/release-checklist.md`.
 
 **Goal:** Make the first stable `0.1.0` release parse documented default-mode
 tcsh/csh surface syntax found in the pinned tcsh 6.24.16 reference samples,
