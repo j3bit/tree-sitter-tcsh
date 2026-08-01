@@ -3,7 +3,7 @@
 #include <string.h>
 
 #include <tree_sitter/api.h>
-#include <tree-sitter-tcsh.h>
+#include <tree_sitter/tree-sitter-tcsh.h>
 
 int main(void) {
   const char *source = "echo packed_consumer\n";

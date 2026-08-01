@@ -4,7 +4,7 @@
 #include <string.h>
 
 #include <tree_sitter/api.h>
-#include <tree-sitter-tcsh.h>
+#include <tree_sitter/tree-sitter-tcsh.h>
 
 static TSPoint point_for_byte(const char *source, uint32_t byte) {
   TSPoint point = {0, 0};
