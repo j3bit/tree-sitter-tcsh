@@ -15,7 +15,7 @@ const PREC = {
   PREFIX: 13,
 };
 
-function immediateWordFragment($, includeLiteralBang, bareWordPattern = /[^\s#;|&<>(){}'"`$!\\*?\[\]%]+/) {
+function immediateWordFragment($, includeLiteralBang, bareWordPattern = /[^\s#;|&<>(){}'"`$!\\*?%]+/) {
   return choice(
     alias(token.immediate(bareWordPattern), $.bare_word),
     alias(token.immediate(seq('\\', /(.|\r?\n)/)), $.escape_sequence),
@@ -386,11 +386,11 @@ module.exports = grammar({
     _brace_alternative: $ => repeat1(immediateWordFragment(
       $,
       true,
-      /[^,\s#;|&<>(){}'"`$!\\*?\[\]%]+/,
+      /[^,\s#;|&<>(){}'"`$!\\*?%]+/,
     )),
     _immediate_brace_pattern: $ => bracePattern($, token.immediate('{')),
 
-    bare_word: _ => token(prec(-1, /[^\s#;|&<>(){}'"`$!\\*?\[\]%]+/)),
+    bare_word: _ => token(prec(-1, /[^\s#;|&<>(){}'"`$!\\*?%]+/)),
     identifier: _ => /[A-Za-z_][A-Za-z0-9_]*/,
     number: _ => /[0-9]+/,
     escape_sequence: _ => token(seq('\\', /(.|\r?\n)/)),

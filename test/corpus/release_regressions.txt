@@ -84,3 +84,50 @@ echo pre"$USER"{left,{mid,{deep,down}tail}end}post*
                     (bare_word))
                   (bare_word))
                 (glob_pattern)))))))))
+
+==================
+release regressions: literal bracket words
+==================
+bindkey ^[^W kill-region
+echo file[0-9] file[^0-9]
+echo file[abc file]
+---
+
+(source_file
+  (command_list
+    (and_or_command
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              (word
+                (identifier))
+              (word
+                (bare_word))
+              (word
+                (bare_word))))))))
+  (command_list
+    (and_or_command
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              (word
+                (identifier))
+              (word
+                (glob_pattern))
+              (word
+                (glob_pattern))))))))
+  (command_list
+    (and_or_command
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              (word
+                (identifier))
+              (word
+                (bare_word))
+              (word
+                (identifier)
+                (bare_word)))))))))
