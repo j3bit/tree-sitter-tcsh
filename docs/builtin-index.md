@@ -4,20 +4,14 @@ This manually audited initial index is derived from the tcsh manual builtins sec
 
 | builtin/form | matrix IDs | coverage approach |
 |---|---|---|
-| alias, unalias | TC-BLT-001, TC-BLT-002 | specialized command nodes plus generic word arguments |
-| set, unset, setenv, unsetenv | TC-BLT-003..006 | specialized command nodes; assignment/list syntax tested through `assignment_word` and `parenthesized_word_list` |
-| complete, uncomplete | TC-BLT-007..008 | specialized command nodes; completion mini-language remains word syntax |
-| bindkey | TC-BLT-009 | specialized command node; editor command names remain word syntax |
-| limit, unlimit | TC-BLT-010..011 | specialized command nodes; resource values remain word syntax |
-| source, eval, exec, time, nice, nohup | TC-BLT-012..017 | specialized command nodes with generic shell word arguments |
-| cd/chdir, pushd, popd, dirs | TC-BLT-018..021 | specialized command nodes with generic words |
-| jobs, fg, bg, kill, wait | TC-BLT-022..026 | specialized command nodes; job specs parsed as `job_spec` |
-| which, where, rehash, hashstat, history | TC-BLT-027..031 | specialized command nodes with generic words |
-| echo, printf, glob | TC-BLT-032..034 | specialized command nodes with generic words/patterns |
-| login, logout, exit, return, shift, umask, sched | TC-BLT-035..041 | specialized command nodes where present; expression arguments are parser-readable where grammar supports them |
+| alias | TC-BLT-001 | `alias_statement` exposes the alias name because it is a consumer-visible definition |
+| set | TC-BLT-003 | `set_statement`/`set_assignment` preserve assignment boundaries and empty values |
+| source | TC-BLT-012 | `source_statement` separates `-h`, target, and trailing arguments; `.` is not a tcsh source alias |
+| exit | TC-BLT-037 | `exit_statement` owns the optional expression surface |
+| all other documented command-word builtins | TC-BLT-002, TC-BLT-004..011, TC-BLT-013..036, TC-BLT-039..999 | parsed as an ordinary `simple_command` name; highlighting is command-position text matching |
 | simple command-word builtins not otherwise listed | TC-BLT-999 | covered by `simple_command`; runtime effects are out of scope |
 
 
 ## Additional audited manual entries covered generically
 
-The following documented builtin/form entries are present in `test/corpus/surface_syntax.txt` and matrix rows `TC-BLT-042` onward. They are parsed by `simple_command` plus `word`/`job_spec`/redirection syntax because their parser-readable surface is command-word oriented in the grammar scope: `%job`, `:`, alloc, bs2cmd, builtins, bye, echotc, filetest, getspath, getxvers, hup, inlib, jobs -Z, kill -l, kill -s, log, ls-F, migrate, newgrp, notify, printenv, rootnode, setpath, setspath, settc, setty, setxvers, stop, suspend, telltc, termname, unhash, universe, ver, and warp. Runtime effects remain out of scope.
+The following documented builtin/form entries are present in `test/corpus/surface_syntax.txt` and matrix rows `TC-BLT-042` onward. They are parsed by `simple_command` plus `word`/`job_spec`/redirection syntax because their parser-readable surface is command-word oriented in the grammar scope: `%job`, `:`, alloc, bs2cmd, builtins, bye, echotc, filetest, getspath, getxvers, hup, inlib, jobs -Z, kill -l, kill -s, log, ls-F, migrate, newgrp, notify, printenv, rootnode, setpath, setspath, settc, setty, setxvers, stop, suspend, telltc, termname, unhash, universe, ver, and warp. `printf`, `return`, and `.` are deliberately not classified as tcsh builtins. Runtime effects remain out of scope.

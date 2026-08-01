@@ -1,0 +1,325 @@
+==================
+command and line boundaries
+==================
+echo one & echo two
+echo semi; echo colon
+echo hi # inline comment
+( echo grouped ) >& errors.log
+if (0) /usr/bin/false && echo outside
+repeat 0 /usr/bin/false && echo outside
+if (1) then
+  echo yes
+else if (0) then
+  echo no
+else
+  echo fallback
+endif
+foreach item (one two)
+  echo $item
+end
+while (0)
+  echo never
+end
+switch (x)
+case x:
+  echo yes
+  breaksw
+default:
+  echo no
+endsw
+# final comment
+---
+
+(source_file
+  (command_list
+    (and_or_command
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              (word
+                (identifier))
+              (word
+                (identifier)))))))
+    (and_or_command
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              (word
+                (identifier))
+              (word
+                (identifier))))))))
+  (command_list
+    (and_or_command
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              (word
+                (identifier))
+              (word
+                (identifier))))))))
+  (command_list
+    (and_or_command
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              (word
+                (identifier))
+              (word
+                (identifier))))))))
+  (command_list
+    (and_or_command
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              (word
+                (identifier))
+              (word
+                (identifier))))))))
+  (comment)
+  (command_list
+    (and_or_command
+      (and_command
+        (pipeline
+          (command
+            (parenthesized_command
+              (command_list
+                (and_or_command
+                  (and_command
+                    (pipeline
+                      (command
+                        (simple_command
+                          (word
+                            (identifier))
+                          (word
+                            (identifier))))))))
+              (redirection
+                (redirect_operator)
+                (word
+                  (bare_word)))))))))
+  (command_list
+    (and_or_command
+      (and_command
+        (pipeline
+          (command
+            (if_statement
+              (expression
+                (number))
+              (command
+                (simple_command
+                  (word
+                    (bare_word)))))))
+        (pipeline
+          (command
+            (simple_command
+              (word
+                (identifier))
+              (word
+                (identifier))))))))
+  (command_list
+    (and_or_command
+      (and_command
+        (pipeline
+          (command
+            (repeat_statement
+              (word
+                (number))
+              (simple_command
+                (word
+                  (bare_word))))))
+        (pipeline
+          (command
+            (simple_command
+              (word
+                (identifier))
+              (word
+                (identifier))))))))
+  (if_statement
+    (expression
+      (number))
+    (command_list
+      (and_or_command
+        (and_command
+          (pipeline
+            (command
+              (simple_command
+                (word
+                  (identifier))
+                (word
+                  (identifier))))))))
+    (else_if_clause
+      (expression
+        (number))
+      (command_list
+        (and_or_command
+          (and_command
+            (pipeline
+              (command
+                (simple_command
+                  (word
+                    (identifier))
+                  (word
+                    (identifier)))))))))
+    (else_clause
+      (command_list
+        (and_or_command
+          (and_command
+            (pipeline
+              (command
+                (simple_command
+                  (word
+                    (identifier))
+                  (word
+                    (identifier))))))))))
+  (foreach_statement
+    (identifier)
+    (word
+      (identifier))
+    (word
+      (identifier))
+    (command_list
+      (and_or_command
+        (and_command
+          (pipeline
+            (command
+              (simple_command
+                (word
+                  (identifier))
+                (word
+                  (variable_substitution
+                    (identifier))))))))))
+  (while_statement
+    (expression
+      (number))
+    (command_list
+      (and_or_command
+        (and_command
+          (pipeline
+            (command
+              (simple_command
+                (word
+                  (identifier))
+                (word
+                  (identifier)))))))))
+  (switch_statement
+    (word
+      (identifier))
+    (case_clause
+      (word
+        (identifier))
+      (command_list
+        (and_or_command
+          (and_command
+            (pipeline
+              (command
+                (simple_command
+                  (word
+                    (identifier))
+                  (word
+                    (identifier))))))))
+      (breaksw_statement))
+    (default_clause
+      (command_list
+        (and_or_command
+          (and_command
+            (pipeline
+              (command
+                (simple_command
+                  (word
+                    (identifier))
+                  (word
+                    (identifier))))))))))
+  (comment))
+
+==================
+empty grouped commands are rejected
+==================
+()
+( ; )
+---
+
+(source_file
+  (ERROR
+    (ERROR)))
+
+==================
+block delimiters require line boundaries
+==================
+if (1) then echo yes; endif
+while (0); end
+switch (x); case x: echo yes; endsw
+---
+
+(source_file
+  (command_list
+    (and_or_command
+      (and_command
+        (pipeline
+          (command
+            (if_statement
+              (expression
+                (number))
+              (ERROR)
+              (command
+                (simple_command
+                  (word
+                    (identifier))
+                  (word
+                    (identifier))))))))))
+  (command_list
+    (and_or_command
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              (word
+                (identifier))))))))
+  (ERROR
+    (expression
+      (number))
+    (ERROR)
+    (word
+      (identifier)))
+  (command_list
+    (and_or_command
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              (word
+                (identifier))
+              (word
+                (identifier)
+                (bare_word))
+              (word
+                (identifier))
+              (word
+                (identifier))))))))
+  (command_list
+    (and_or_command
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              (word
+                (identifier)))))))))
+
+==================
+case colon is immediate
+==================
+switch (x)
+case x :
+endsw
+---
+
+(source_file
+  (switch_statement
+    (word
+      (identifier))
+    (ERROR
+      (identifier)
+      (bare_word))))

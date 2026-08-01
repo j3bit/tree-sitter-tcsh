@@ -11,6 +11,8 @@ A Tree-sitter grammar for documented `tcsh`/`csh` surface syntax. The grammar is
 - Provides editor queries for highlights, locals, tags, and Neovim folds.
 - Commits generated parser artifacts for downstream consumers.
 - Uses a release gate that requires parser-readable matrix rows to be tested.
+- Ships a C-only parser contract with a public header; Node and other runtime
+  bindings are not claimed by the initial release.
 
 ## Scope and Non-goals
 
@@ -49,8 +51,13 @@ npm test                                 # run Tree-sitter corpus tests
 npm run check:coverage-matrix:release    # enforce release-green syntax coverage
 npm run check:no-error                   # parse smoke examples without ERROR/MISSING
 npm run check:queries                    # validate editor query files
+npm run check:query-captures             # assert position-sensitive captures
 npm run check:c-compile                  # compile the generated C parser
-npm run check                            # run the full CI/local validation gate
+npm run check:recovery                   # verify malformed-input recovery
+npm run check:stress                     # run large/incremental performance gates
+npm run check:package                    # pack and run a fresh C consumer
+npm run check                            # run the development CI/local gate
+npm run check:release                    # require every parser-readable row to be release-green
 ```
 
 After changing `grammar.js`, always run `npm run generate` and commit the updated generated files under `src/`.
@@ -80,15 +87,25 @@ Query files live in `queries/`:
 
 ## Syntax Coverage Policy
 
-The coverage matrix is the source of truth for release readiness. Each parser-readable row must have a parser rule, fixture path, expected node, and `tested` status. The release check fails if any parser-readable row remains only `implemented`.
+The coverage matrix is the source of truth for release readiness. Each parser-readable row must have a parser rule, fixture path, expected node, and `tested` status. The development gate accepts explicitly tracked `implemented` work; the release gate fails if any parser-readable row remains only `implemented`.
 
 ```sh
-npm run check:coverage-matrix:release
+npm run check:release
 ```
 
 ## Scanner Policy
 
-No external scanner is currently implemented. Scanner work must pass the documented gate in `docs/scanner-design.md`, including token order, DSL failure evidence, state/serialization policy, recovery behavior, binding integration, and tests.
+The external scanner implements literal-dollar/history/label/redirect boundaries,
+structured backticks, `@` boundaries, and exact heredoc delimiter, opaque body,
+and terminator attachment. Its token order, state serialization, recovery
+behavior, and scanner tests are specified in `docs/scanner-design.md`.
+
+## C consumer
+
+The packed artifact contains `bindings/c/tree-sitter-tcsh.h`, `src/parser.c`,
+`src/scanner.c`, and the generated lexer header. Link those sources with a
+compatible `libtree-sitter`; `npm run check:package` demonstrates a clean
+compile, link, language registration, and sample parse from `npm pack`.
 
 ## Contributing
 
@@ -96,7 +113,7 @@ Before opening a pull request:
 
 1. Keep changes focused and update documentation when behavior changes.
 2. Add or update corpus fixtures and coverage-matrix rows for new syntax.
-3. Run `npm run check`.
+3. Run `npm run check`; run `npm run check:release` before a release.
 4. Use short imperative commit messages, for example `Add Neovim fold queries`.
 
 Do not copy third-party grammar code without recording license, commit, copied files, and rationale in `docs/reference-ledger.md`.

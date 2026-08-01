@@ -1,0 +1,336 @@
+==================
+statement expression label and redirect surfaces
+==================
+set foo=
+@
+@ x <<= 1
+source -h pre${dir}/file
+if (-fx file) echo executable
+if (-lLo link) echo owned_link
+if (-P22 file) echo writable
+( echo ok ) >& err
+echo force >! file
+echo append_force >>! file
+123:
+goto 123
+build.step:
+goto build.step
+retry-later:
+goto retry-later
+exit 1 + 2
+echo `echo nested; echo again`
+---
+
+(source_file
+  (command_list
+    (and_or_command
+      (and_command
+        (pipeline
+          (command
+            (set_statement
+              (set_command)
+              (set_assignment
+                (identifier))))))))
+  (at_statement)
+  (at_statement
+    (identifier)
+    (assignment_operator)
+    (expression
+      (number)))
+  (command_list
+    (and_or_command
+      (and_command
+        (pipeline
+          (command
+            (source_statement
+              (source_command)
+              (source_option)
+              (source_target
+                (word
+                  (identifier)
+                  (variable_substitution
+                    (identifier))
+                  (bare_word)))))))))
+  (command_list
+    (and_or_command
+      (and_command
+        (pipeline
+          (command
+            (if_statement
+              (expression
+                (file_test_expression
+                  (file_test_operator)
+                  (word
+                    (identifier))))
+              (command
+                (simple_command
+                  (word
+                    (identifier))
+                  (word
+                    (identifier))))))))))
+  (command_list
+    (and_or_command
+      (and_command
+        (pipeline
+          (command
+            (if_statement
+              (expression
+                (file_test_expression
+                  (file_test_operator)
+                  (word
+                    (identifier))))
+              (command
+                (simple_command
+                  (word
+                    (identifier))
+                  (word
+                    (identifier))))))))))
+  (command_list
+    (and_or_command
+      (and_command
+        (pipeline
+          (command
+            (if_statement
+              (expression
+                (file_test_expression
+                  (file_test_operator)
+                  (word
+                    (identifier))))
+              (command
+                (simple_command
+                  (word
+                    (identifier))
+                  (word
+                    (identifier))))))))))
+  (command_list
+    (and_or_command
+      (and_command
+        (pipeline
+          (command
+            (parenthesized_command
+              (command_list
+                (and_or_command
+                  (and_command
+                    (pipeline
+                      (command
+                        (simple_command
+                          (word
+                            (identifier))
+                          (word
+                            (identifier))))))))
+              (redirection
+                (redirect_operator)
+                (word
+                  (identifier)))))))))
+  (command_list
+    (and_or_command
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              (word
+                (identifier))
+              (word
+                (identifier))
+              (redirection
+                (redirect_operator)
+                (word
+                  (identifier)))))))))
+  (command_list
+    (and_or_command
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              (word
+                (identifier))
+              (word
+                (identifier))
+              (redirection
+                (redirect_operator)
+                (word
+                  (identifier)))))))))
+  (label
+    (label_name))
+  (goto_statement
+    (word
+      (number)))
+  (label
+    (label_name))
+  (goto_statement
+    (word
+      (bare_word)))
+  (label
+    (label_name))
+  (goto_statement
+    (word
+      (bare_word)))
+  (command_list
+    (and_or_command
+      (and_command
+        (pipeline
+          (command
+            (exit_statement
+              (exit_command)
+              (expression
+                (binary_expression
+                  (expression
+                    (number))
+                  (expression
+                    (number))))))))))
+  (command_list
+    (and_or_command
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              (word
+                (identifier)
+                (backtick_command_substitution
+                  (command_list
+                    (and_or_command
+                      (and_command
+                        (pipeline
+                          (command
+                            (simple_command
+                              (word
+                                (identifier))
+                              (word
+                                (identifier))))))))
+                  (command_list
+                    (and_or_command
+                      (and_command
+                        (pipeline
+                          (command
+                            (simple_command
+                              (word
+                                (identifier))
+                              (word
+                                (identifier)))))))))))))))))
+
+==================
+incomplete at forms are commands not assignments
+==================
+@ foo
+@ = 1
+---
+
+(source_file
+  (at_statement
+    (identifier)
+    (ERROR)
+    (assignment_operator)
+    (expression
+      (number))))
+
+==================
+ternary and switch expressions are rejected
+==================
+if (1 ? 2 : 3) echo no
+switch (1 + 2)
+endsw
+---
+
+(source_file
+  (command_list
+    (and_or_command
+      (and_command
+        (pipeline
+          (command
+            (if_statement
+              (expression
+                (number))
+              (ERROR
+                (UNEXPECTED '?')
+                (number)
+                (bare_word)
+                (number))
+              (command
+                (simple_command
+                  (word
+                    (identifier))
+                  (word
+                    (identifier))))))))))
+  (switch_statement
+    (word
+      (number))
+    (ERROR
+      (number))))
+
+==================
+invalid redirects remain erroneous
+==================
+echo bad <& file
+echo bad <<& file
+echo bad >&& file
+echo bad >&!& file
+---
+
+(source_file
+  (command_list
+    (and_or_command
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              (word
+                (identifier))
+              (word
+                (identifier)))))))
+    (ERROR
+      (redirect_operator))
+    (and_or_command
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              (word
+                (identifier))))))))
+  (command_list
+    (and_or_command
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              (word
+                (identifier))
+              (word
+                (identifier)))))))
+    (ERROR)
+    (and_or_command
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              (word
+                (identifier))))))))
+  (command_list
+    (and_or_command
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              (word
+                (identifier))
+              (word
+                (identifier))
+              (redirection
+                (redirect_operator)
+                (ERROR)
+                (word
+                  (identifier)))))))))
+  (command_list
+    (and_or_command
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              (word
+                (identifier))
+              (word
+                (identifier))
+              (redirection
+                (redirect_operator)
+                (ERROR)
+                (word
+                  (identifier))))))))))

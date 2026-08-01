@@ -1,6 +1,6 @@
 {
   "name": "tree-sitter-tcsh",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Tree-sitter grammar for documented tcsh/csh surface syntax.",
   "type": "commonjs",
   "keywords": [
@@ -16,11 +16,17 @@
     "parse": "npm exec -- tree-sitter parse --grammar-path . --",
     "check:coverage-matrix": "node scripts/check-coverage-matrix.js",
     "check:node-contract": "node scripts/check-node-contract.js",
-    "check:no-error": "node scripts/check-no-error.js examples/sample.tcsh examples/showcase.tcsh",
-    "check": "npm run generate && npm test && npm run check:coverage-matrix && npm run check:coverage-matrix:release && npm run check:node-contract && npm run check:no-error && npm run check:queries && npm run check:c-compile",
+    "check:no-error": "node scripts/check-no-error.js examples/sample.tcsh examples/showcase.tcsh examples/p2-boundaries.tcsh examples/heredoc.tcsh examples/p4-substitutions.tcsh examples/p5-statements.tcsh",
+    "check": "npm run generate && npm test && npm run check:coverage-matrix && npm run check:node-contract && npm run check:no-error && npm run check:queries && npm run check:query-captures && npm run check:scanner && npm run check:c-compile && npm run check:recovery",
+    "check:release": "npm run check && npm run check:stress && npm run check:package && npm run check:coverage-matrix:release",
     "check:queries": "npm exec -- tree-sitter query --grammar-path . --quiet queries/highlights.scm examples/sample.tcsh && npm exec -- tree-sitter query --grammar-path . --quiet queries/locals.scm examples/sample.tcsh && npm exec -- tree-sitter query --grammar-path . --quiet queries/tags.scm examples/sample.tcsh && npm exec -- tree-sitter query --grammar-path . --quiet queries/folds.scm examples/sample.tcsh",
+    "check:query-captures": "node scripts/check-query-captures.js",
     "check:coverage-matrix:release": "node scripts/check-coverage-matrix.js --release",
-    "check:c-compile": "cc -std=c11 -Isrc -c src/parser.c -o /tmp/tree-sitter-tcsh-parser.o"
+    "check:scanner": "cc -std=c11 -Wall -Wextra -Werror -Isrc test/scanner_test.c src/scanner.c -o /tmp/tree-sitter-tcsh-scanner-test && /tmp/tree-sitter-tcsh-scanner-test",
+    "check:c-compile": "cc -std=c11 -Wall -Wextra -Werror -Isrc -c src/parser.c -o /tmp/tree-sitter-tcsh-parser.o && cc -std=c11 -Wall -Wextra -Werror -Isrc -c src/scanner.c -o /tmp/tree-sitter-tcsh-scanner.o",
+    "check:recovery": "node scripts/check-recovery.js",
+    "check:stress": "node scripts/check-stress.js",
+    "check:package": "node scripts/check-package.js"
   },
   "devDependencies": {
     "tree-sitter-cli": "0.26.8"
@@ -28,7 +34,7 @@
   "files": [
     "grammar.js",
     "tree-sitter.json",
-    "binding.gyp",
+    "bindings/c/",
     "queries/",
     "src/",
     "docs/",

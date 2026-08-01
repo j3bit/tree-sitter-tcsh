@@ -10,68 +10,59 @@ EOF_MARKER
 (source_file
   (command_list
     (and_or_command
-      (pipeline
-        (command
-          (simple_command
-            (builtin_command
-              (echo_command))
-            (word
-              (identifier)))))))
-  (command_list
-    (and_or_command
-      (pipeline
-        (command
-          (simple_command
-            (word
-              (identifier))
-            (word
-              (option_word))))
-        (command
-          (simple_command
-            (word
-              (identifier)))))
-      (pipeline
-        (command
-          (simple_command
-            (word
-              (identifier))
-            (redirection
-              (redirect_operator)
+      (and_command
+        (pipeline
+          (command
+            (simple_command
               (word
-                (identifier)))
-            (redirection
-              (redirect_operator)
-              (word
-                (identifier)))
-            (redirection
-              (redirect_operator)
+                (identifier))
               (word
                 (identifier))))))))
   (command_list
     (and_or_command
-      (pipeline
-        (command
-          (simple_command
-            (word
-              (identifier))
-            (redirection
-              (redirect_operator)
+      (and_command
+        (pipeline
+          (command
+            (simple_command
               (word
-                (identifier))))))))
+                (identifier))
+              (word
+                (bare_word))))
+          (command
+            (simple_command
+              (word
+                (identifier)))))
+        (pipeline
+          (command
+            (simple_command
+              (word
+                (identifier))
+              (redirection
+                (redirect_operator)
+                (word
+                  (identifier)))
+              (redirection
+                (redirect_operator)
+                (word
+                  (identifier)))
+              (redirection
+                (redirect_operator)
+                (word
+                  (identifier)))))))))
   (command_list
     (and_or_command
-      (pipeline
-        (command
-          (simple_command
-            (word
-              (identifier)))))))
-  (command_list
-    (and_or_command
-      (pipeline
-        (command
-          (simple_command
-            (word
-              (identifier))))))))
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              (word
+                (identifier))
+              (redirection
+                (heredoc_redirect
+                  (redirect_operator)
+                  (heredoc_delimiter)
+                  (heredoc_body)
+                  (heredoc_end))))))))))
 
 ==================
 quoting substitutions and patterns
@@ -82,41 +73,57 @@ echo 'single quoted' "double $USER !:1" `hostname` $argv[1-2] $?prompt !! !$ *.c
 (source_file
   (command_list
     (and_or_command
-      (pipeline
-        (command
-          (simple_command
-            (builtin_command
-              (echo_command))
-            (word
-              (single_quoted_string))
-            (word
-              (double_quoted_string
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              (word
+                (identifier))
+              (word
+                (single_quoted_string))
+              (word
+                (double_quoted_string
+                  (variable_substitution
+                    (identifier))
+                  (history_substitution
+                    (history_word_designator)))
+                (backtick_command_substitution
+                  (command_list
+                    (and_or_command
+                      (and_command
+                        (pipeline
+                          (command
+                            (simple_command
+                              (word
+                                (identifier))))))))))
+              (word
                 (variable_substitution
-                  (identifier))
-                (history_substitution)))
-            (word
-              (backtick_command_substitution))
-            (word
-              (variable_substitution
-                (identifier)))
-            (word
-              (glob_pattern))
-            (word
-              (variable_substitution
-                (special_parameter)
-                (identifier)))
-            (word
-              (history_substitution))
-            (word
-              (history_substitution))
-            (word
-              (glob_pattern))
-            (word
-              (glob_pattern))
-            (word
-              (glob_pattern))
-            (word
-              (job_spec))))))))
+                  (identifier)
+                  (subscript
+                    (selector_index
+                      (number))
+                    (selector_index
+                      (number)))))
+              (word
+                (variable_substitution
+                  (special_parameter)
+                  (identifier)))
+              (word
+                (history_substitution
+                  (history_event
+                    (history_event_name))))
+              (word
+                (history_substitution
+                  (history_word_designator)))
+              (word
+                (glob_pattern))
+              (word
+                (glob_pattern))
+              (word
+                (glob_pattern
+                  (brace_pattern)))
+              (word
+                (job_spec)))))))))
 
 ==================
 braced variable substitution names
@@ -130,52 +137,56 @@ source ${ROOT}/env.csh
 (source_file
   (command_list
     (and_or_command
-      (pipeline
-        (command
-          (simple_command
-            (builtin_command
-              (echo_command))
-            (word
-              (variable_substitution
-                (identifier))))))))
-  (command_list
-    (and_or_command
-      (pipeline
-        (command
-          (simple_command
-            (builtin_command
-              (echo_command))
-            (word
-              (variable_substitution
-                (number))))))))
-  (command_list
-    (and_or_command
-      (pipeline
-        (command
-          (simple_command
-            (builtin_command
-              (echo_command))
-            (word
-              (variable_substitution
-                (special_parameter)
-                (identifier))))))))
-  (command_list
-    (and_or_command
-      (pipeline
-        (command
-          (source_statement
-            command: (source_command)
-            target: (source_target
-              (variable_substitution
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              name: (word
                 (identifier))
-              (source_path_suffix))))))))
+              argument: (word
+                (variable_substitution
+                  name: (identifier)))))))))
+  (command_list
+    (and_or_command
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              name: (word
+                (identifier))
+              argument: (word
+                (variable_substitution
+                  name: (number)))))))))
+  (command_list
+    (and_or_command
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              name: (word
+                (identifier))
+              argument: (word
+                (variable_substitution
+                  operator: (special_parameter)
+                  name: (identifier)))))))))
+  (command_list
+    (and_or_command
+      (and_command
+        (pipeline
+          (command
+            (source_statement
+              command: (source_command)
+              target: (source_target
+                (word
+                  (variable_substitution
+                    name: (identifier))
+                  (bare_word))))))))))
 
 ==================
 expressions and at assignments
 ==================
 @ count = 1 + 2 * 3
 if ( -e file && $count >= 3 ) echo ok
-@ result = $status ? 1 : 0
 @ paren = ( 1 + 2 ) * 3
 @ neg = ! 0
 ---
@@ -194,44 +205,33 @@ if ( -e file && $count >= 3 ) echo ok
               (number))
             (expression
               (number)))))))
-  (if_statement
-    (expression
-      (binary_expression
-        (expression
-          (file_test_expression
-            (file_test_operator)
-            (word
-              (identifier))))
-        (expression
-          (binary_expression
-            (expression
-              (word
-                (variable_substitution
-                  (identifier))))
-            (expression
-              (number))))))
-    (command_list
-      (and_or_command
+  (command_list
+    (and_or_command
+      (and_command
         (pipeline
           (command
-            (simple_command
-              (builtin_command
-                (echo_command))
-              (word
-                (identifier))))))))
-  (at_statement
-    (identifier)
-    (assignment_operator)
-    (expression
-      (ternary_expression
-        (expression
-          (word
-            (variable_substitution
-              (identifier))))
-        (expression
-          (number))
-        (expression
-          (number)))))
+            (if_statement
+              (expression
+                (binary_expression
+                  (expression
+                    (file_test_expression
+                      (file_test_operator)
+                      (word
+                        (identifier))))
+                  (expression
+                    (binary_expression
+                      (expression
+                        (word
+                          (variable_substitution
+                            (identifier))))
+                      (expression
+                        (number))))))
+              (command
+                (simple_command
+                  (word
+                    (identifier))
+                  (word
+                    (identifier))))))))))
   (at_statement
     (identifier)
     (assignment_operator)
@@ -284,99 +284,103 @@ break
 
 (source_file
   (if_statement
-    (expression
+    condition: (expression
       (binary_expression
-        (expression
+        left: (expression
           (word
             (variable_substitution
-              (identifier))))
-        (expression
+              name: (identifier))))
+        right: (expression
           (number))))
-    (command_list
+    body: (command_list
       (and_or_command
-        (pipeline
-          (command
-            (simple_command
-              (builtin_command
-                (echo_command))
-              (word
-                (identifier)))))))
-    (else_if_clause
-      (expression
+        (and_command
+          (pipeline
+            (command
+              (simple_command
+                name: (word
+                  (identifier))
+                argument: (word
+                  (identifier))))))))
+    alternative: (else_if_clause
+      condition: (expression
         (binary_expression
-          (expression
+          left: (expression
             (word
               (variable_substitution
-                (identifier))))
-          (expression
+                name: (identifier))))
+          right: (expression
             (word
               (glob_pattern)))))
-      (command_list
+      body: (command_list
         (and_or_command
-          (pipeline
-            (command
-              (simple_command
-                (builtin_command
-                  (echo_command))
-                (word
-                  (identifier))))))))
-    (else_clause
-      (command_list
+          (and_command
+            (pipeline
+              (command
+                (simple_command
+                  name: (word
+                    (identifier))
+                  argument: (word
+                    (identifier)))))))))
+    alternative: (else_clause
+      body: (command_list
         (and_or_command
-          (pipeline
-            (command
-              (simple_command
-                (builtin_command
-                  (echo_command))
-                (word
-                  (identifier)))))))))
+          (and_command
+            (pipeline
+              (command
+                (simple_command
+                  name: (word
+                    (identifier))
+                  argument: (word
+                    (identifier))))))))))
   (foreach_statement
     variable: (identifier)
-    (word
+    subject: (word
       (identifier))
-    (word
+    subject: (word
       (identifier))
-    (word
+    subject: (word
       (identifier))
-    (command_list
+    body: (command_list
       (and_or_command
-        (pipeline
-          (command
-            (simple_command
-              (builtin_command
-                (echo_command))
-              (word
-                (variable_substitution
-                  (identifier)))))))))
+        (and_command
+          (pipeline
+            (command
+              (simple_command
+                name: (word
+                  (identifier))
+                argument: (word
+                  (variable_substitution
+                    name: (identifier))))))))))
   (while_statement
-    (expression
+    condition: (expression
       (binary_expression
-        (expression
+        left: (expression
           (word
             (variable_substitution
-              (identifier))))
-        (expression
+              name: (identifier))))
+        right: (expression
           (number))))
-    (at_statement
-      (identifier)
+    body: (at_statement
+      name: (identifier)
       (update_operator)))
   (switch_statement
-    (expression
-      (word
-        (variable_substitution
-          (identifier)
-          (subscript
+    subject: (word
+      (variable_substitution
+        name: (identifier)
+        selector: (subscript
+          start: (selector_index
             (number)))))
-    (case_clause
+    body: (case_clause
       pattern: (word
         (glob_pattern))
       (breaksw_statement))
-    (default_clause
+    body: (default_clause
       (goto_statement
-        (word
+        target: (word
           (identifier)))))
   (label
-    name: (identifier))
+    name: (label_name))
   (continue_statement)
   (break_statement))
 
@@ -394,32 +398,33 @@ endsw
 
 (source_file
   (switch_statement
-    (expression
-      (word
-        (variable_substitution
-          (identifier))))
-    (case_clause
+    subject: (word
+      (variable_substitution
+        name: (identifier)))
+    body: (case_clause
       pattern: (word
         (identifier))
       (command_list
         (and_or_command
-          (pipeline
-            (command
-              (simple_command
-                (builtin_command
-                  (echo_command))
-                (word
-                  (identifier)))))))
+          (and_command
+            (pipeline
+              (command
+                (simple_command
+                  name: (word
+                    (identifier))
+                  argument: (word
+                    (identifier))))))))
       (breaksw_statement))
-    (default_clause
+    body: (default_clause
       (command_list
         (and_or_command
-          (pipeline
-            (command
-              (simple_command
-                (builtin_command
-                  (echo_command))
-                (reserved_argument_word)))))))))
+          (and_command
+            (pipeline
+              (command
+                (simple_command
+                  name: (word
+                    (identifier))
+                  argument: (reserved_argument_word))))))))))
 
 ==================
 builtin surface forms
@@ -468,375 +473,411 @@ sched +60 echo later
 (source_file
   (command_list
     (and_or_command
-      (pipeline
-        (command
-          (simple_command
-            (builtin_command
-              (alias_command))
-            (word
-              (identifier))
-            (word
-              (single_quoted_string)))))))
+      (and_command
+        (pipeline
+          (command
+            (alias_statement
+              command: (alias_command)
+              name: (word
+                (identifier))
+              argument: (word
+                (single_quoted_string))))))))
   (command_list
     (and_or_command
-      (pipeline
-        (command
-          (simple_command
-            (builtin_command
-              (unalias_command))
-            (word
-              (identifier)))))))
-  (command_list
-    (and_or_command
-      (pipeline
-        (command
-          (simple_command
-            (builtin_command
-              (set_command))
-            (assignment_word
-              (identifier)
-              (word
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              name: (word
+                (identifier))
+              argument: (word
                 (identifier))))))))
   (command_list
     (and_or_command
-      (pipeline
-        (command
-          (simple_command
-            (builtin_command
-              (unset_command))
-            (word
-              (identifier)))))))
+      (and_command
+        (pipeline
+          (command
+            (set_statement
+              command: (set_command)
+              (set_assignment
+                name: (identifier)
+                value: (word
+                  (identifier)))))))))
   (command_list
     (and_or_command
-      (pipeline
-        (command
-          (simple_command
-            (builtin_command
-              (setenv_command))
-            (word
-              (identifier))
-            (word
-              (identifier)))))))
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              name: (word
+                (identifier))
+              argument: (word
+                (identifier))))))))
   (command_list
     (and_or_command
-      (pipeline
-        (command
-          (simple_command
-            (builtin_command
-              (unsetenv_command))
-            (word
-              (identifier)))))))
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              name: (word
+                (identifier))
+              argument: (word
+                (identifier))
+              argument: (word
+                (identifier))))))))
   (command_list
     (and_or_command
-      (pipeline
-        (command
-          (simple_command
-            (builtin_command
-              (complete_command))
-            (builtin_command
-              (cd_command))
-            (word
-              (single_quoted_string)))))))
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              name: (word
+                (identifier))
+              argument: (word
+                (identifier))))))))
   (command_list
     (and_or_command
-      (pipeline
-        (command
-          (simple_command
-            (builtin_command
-              (uncomplete_command))
-            (builtin_command
-              (cd_command)))))))
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              name: (word
+                (identifier))
+              argument: (word
+                (identifier))
+              argument: (word
+                (single_quoted_string))))))))
   (command_list
     (and_or_command
-      (pipeline
-        (command
-          (simple_command
-            (builtin_command
-              (bindkey_command))
-            (word
-              (single_quoted_string))
-            (word
-              (identifier))
-            (word
-              (option_word)))))))
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              name: (word
+                (identifier))
+              argument: (word
+                (identifier))))))))
   (command_list
     (and_or_command
-      (pipeline
-        (command
-          (simple_command
-            (builtin_command
-              (limit_command))
-            (word
-              (identifier))
-            (word
-              (number)))))))
-  (command_list
-    (and_or_command
-      (pipeline
-        (command
-          (simple_command
-            (builtin_command
-              (unlimit_command))
-            (word
-              (identifier)))))))
-  (command_list
-    (and_or_command
-      (pipeline
-        (command
-          (source_statement
-            command: (source_command)
-            target: (source_target
-              (word
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              name: (word
+                (identifier))
+              argument: (word
+                (single_quoted_string))
+              argument: (word
                 (bare_word))))))))
   (command_list
     (and_or_command
-      (pipeline
-        (command
-          (simple_command
-            (builtin_command
-              (eval_command))
-            (builtin_command
-              (echo_command))
-            (word
-              (identifier)))))))
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              name: (word
+                (identifier))
+              argument: (word
+                (identifier))
+              argument: (word
+                (number))))))))
   (command_list
     (and_or_command
-      (pipeline
-        (command
-          (simple_command
-            (builtin_command
-              (exec_command))
-            (builtin_command
-              (echo_command))
-            (builtin_command
-              (exec_command)))))))
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              name: (word
+                (identifier))
+              argument: (word
+                (identifier))))))))
   (command_list
     (and_or_command
-      (pipeline
-        (command
-          (simple_command
-            (builtin_command
-              (nice_command))
-            (word
-              (option_word))
-            (builtin_command
-              (echo_command))
-            (builtin_command
-              (nice_command)))))))
+      (and_command
+        (pipeline
+          (command
+            (source_statement
+              command: (source_command)
+              target: (source_target
+                (word
+                  (bare_word)))))))))
   (command_list
     (and_or_command
-      (pipeline
-        (command
-          (simple_command
-            (builtin_command
-              (nohup_command))
-            (builtin_command
-              (echo_command))
-            (word
-              (identifier)))))))
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              name: (word
+                (identifier))
+              argument: (word
+                (identifier))
+              argument: (word
+                (identifier))))))))
   (command_list
     (and_or_command
-      (pipeline
-        (command
-          (simple_command
-            (builtin_command
-              (cd_command))
-            (word
-              (bare_word)))))))
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              name: (word
+                (identifier))
+              argument: (word
+                (identifier))
+              argument: (word
+                (identifier))))))))
   (command_list
     (and_or_command
-      (pipeline
-        (command
-          (simple_command
-            (builtin_command
-              (pushd_command))
-            (word
-              (bare_word)))))))
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              name: (word
+                (identifier))
+              argument: (word
+                (bare_word))
+              argument: (word
+                (identifier))
+              argument: (word
+                (identifier))))))))
   (command_list
     (and_or_command
-      (pipeline
-        (command
-          (simple_command
-            (builtin_command
-              (popd_command)))))))
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              name: (word
+                (identifier))
+              argument: (word
+                (identifier))
+              argument: (word
+                (identifier))))))))
   (command_list
     (and_or_command
-      (pipeline
-        (command
-          (simple_command
-            (builtin_command
-              (dirs_command))
-            (word
-              (option_word)))))))
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              name: (word
+                (identifier))
+              argument: (word
+                (bare_word))))))))
   (command_list
     (and_or_command
-      (pipeline
-        (command
-          (simple_command
-            (builtin_command
-              (jobs_command))
-            (word
-              (option_word)))))))
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              name: (word
+                (identifier))
+              argument: (word
+                (bare_word))))))))
   (command_list
     (and_or_command
-      (pipeline
-        (command
-          (simple_command
-            (builtin_command
-              (fg_command))
-            (word
-              (job_spec)))))))
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              name: (word
+                (identifier))))))))
   (command_list
     (and_or_command
-      (pipeline
-        (command
-          (simple_command
-            (builtin_command
-              (bg_command))
-            (word
-              (job_spec)))))))
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              name: (word
+                (identifier))
+              argument: (word
+                (bare_word))))))))
   (command_list
     (and_or_command
-      (pipeline
-        (command
-          (simple_command
-            (builtin_command
-              (kill_command))
-            (word
-              (job_spec)))))))
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              name: (word
+                (identifier))
+              argument: (word
+                (bare_word))))))))
   (command_list
     (and_or_command
-      (pipeline
-        (command
-          (simple_command
-            (builtin_command
-              (wait_command)))))))
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              name: (word
+                (identifier))
+              argument: (word
+                (job_spec))))))))
   (command_list
     (and_or_command
-      (pipeline
-        (command
-          (simple_command
-            (builtin_command
-              (which_command))
-            (word
-              (identifier)))))))
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              name: (word
+                (identifier))
+              argument: (word
+                (job_spec))))))))
   (command_list
     (and_or_command
-      (pipeline
-        (command
-          (simple_command
-            (builtin_command
-              (where_command))
-            (word
-              (identifier)))))))
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              name: (word
+                (identifier))
+              argument: (word
+                (job_spec))))))))
   (command_list
     (and_or_command
-      (pipeline
-        (command
-          (simple_command
-            (builtin_command
-              (rehash_command)))))))
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              name: (word
+                (identifier))))))))
   (command_list
     (and_or_command
-      (pipeline
-        (command
-          (simple_command
-            (builtin_command
-              (hashstat_command)))))))
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              name: (word
+                (identifier))
+              argument: (word
+                (identifier))))))))
   (command_list
     (and_or_command
-      (pipeline
-        (command
-          (simple_command
-            (builtin_command
-              (history_command))
-            (word
-              (option_word)))))))
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              name: (word
+                (identifier))
+              argument: (word
+                (identifier))))))))
   (command_list
     (and_or_command
-      (pipeline
-        (command
-          (simple_command
-            (builtin_command
-              (echo_command))
-            (word
-              (identifier)))))))
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              name: (word
+                (identifier))))))))
   (command_list
     (and_or_command
-      (pipeline
-        (command
-          (simple_command
-            (builtin_command
-              (printf_command))
-            (word
-              (single_quoted_string))
-            (word
-              (identifier)))))))
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              name: (word
+                (identifier))))))))
   (command_list
     (and_or_command
-      (pipeline
-        (command
-          (simple_command
-            (builtin_command
-              (glob_command))
-            (word
-              (glob_pattern)))))))
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              name: (word
+                (identifier))
+              argument: (word
+                (bare_word))))))))
   (command_list
     (and_or_command
-      (pipeline
-        (command
-          (simple_command
-            (builtin_command
-              (logout_command)))))))
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              name: (word
+                (identifier))
+              argument: (word
+                (identifier))))))))
   (command_list
     (and_or_command
-      (pipeline
-        (command
-          (simple_command
-            (builtin_command
-              (login_command))
-            (word
-              (identifier)))))))
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              name: (word
+                (identifier))
+              argument: (word
+                (single_quoted_string
+                  (escape_sequence)))
+              argument: (word
+                (identifier))))))))
   (command_list
     (and_or_command
-      (pipeline
-        (command
-          (simple_command
-            (builtin_command
-              (return_command))
-            (word
-              (number)))))))
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              name: (word
+                (identifier))
+              argument: (word
+                (glob_pattern))))))))
   (command_list
     (and_or_command
-      (pipeline
-        (command
-          (simple_command
-            (builtin_command
-              (shift_command))
-            (word
-              (identifier)))))))
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              name: (word
+                (identifier))))))))
   (command_list
     (and_or_command
-      (pipeline
-        (command
-          (simple_command
-            (builtin_command
-              (umask_command))
-            (word
-              (number)))))))
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              name: (word
+                (identifier))
+              argument: (word
+                (identifier))))))))
   (command_list
     (and_or_command
-      (pipeline
-        (command
-          (simple_command
-            (builtin_command
-              (sched_command))
-            (word
-              (option_word))
-            (builtin_command
-              (echo_command))
-            (word
-              (identifier))))))))
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              name: (word
+                (identifier))
+              argument: (word
+                (number))))))))
+  (command_list
+    (and_or_command
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              name: (word
+                (identifier))
+              argument: (word
+                (identifier))))))))
+  (command_list
+    (and_or_command
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              name: (word
+                (identifier))
+              argument: (word
+                (number))))))))
+  (command_list
+    (and_or_command
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              name: (word
+                (identifier))
+              argument: (word
+                (bare_word))
+              argument: (word
+                (identifier))
+              argument: (word
+                (identifier)))))))))
 
 ==================
 structured source targets
@@ -851,50 +892,65 @@ source `pwd`/common.csh
 (source_file
   (command_list
     (and_or_command
-      (pipeline
-        (command
-          (source_statement
-            command: (source_command)
-            target: (source_target
-              (word
+      (and_command
+        (pipeline
+          (command
+            (source_statement
+              command: (source_command)
+              target: (source_target
+                (word
+                  (bare_word)))))))))
+  (command_list
+    (and_or_command
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              name: (word
+                (bare_word))
+              argument: (word
                 (bare_word))))))))
   (command_list
     (and_or_command
-      (pipeline
-        (command
-          (source_statement
-            command: (source_command)
-            target: (source_target
-              (word
-                (bare_word))))))))
+      (and_command
+        (pipeline
+          (command
+            (source_statement
+              command: (source_command)
+              target: (source_target
+                (word
+                  (variable_substitution
+                    name: (identifier))
+                  (bare_word)))))))))
   (command_list
     (and_or_command
-      (pipeline
-        (command
-          (source_statement
-            command: (source_command)
-            target: (source_target
-              (variable_substitution
-                (identifier))
-              (source_path_suffix)))))))
+      (and_command
+        (pipeline
+          (command
+            (source_statement
+              command: (source_command)
+              target: (source_target
+                (word
+                  (glob_pattern)))))))))
   (command_list
     (and_or_command
-      (pipeline
-        (command
-          (source_statement
-            command: (source_command)
-            target: (source_target
-              (word
-                (glob_pattern))))))))
-  (command_list
-    (and_or_command
-      (pipeline
-        (command
-          (source_statement
-            command: (source_command)
-            target: (source_target
-              (backtick_command_substitution)
-              (source_path_suffix))))))))
+      (and_command
+        (pipeline
+          (command
+            (source_statement
+              command: (source_command)
+              target: (source_target
+                (word
+                  (backtick_command_substitution
+                    (command_list
+                      (and_or_command
+                        (and_command
+                          (pipeline
+                            (command
+                              (simple_command
+                                name: (word
+                                  (identifier)))))))))
+                  (bare_word))))))))))
 
 ==================
 source target excludes trailing syntax
@@ -907,44 +963,48 @@ source ${ROOT}/env.csh >& /tmp/source.log
 (source_file
   (command_list
     (and_or_command
-      (pipeline
-        (command
-          (source_statement
-            command: (source_command)
-            target: (source_target
-              (word
-                (bare_word)))
-            (word
-              (option_word))
-            (redirection
-              (redirect_operator)
-              (word
-                (bare_word))))))))
+      (and_command
+        (pipeline
+          (command
+            (source_statement
+              command: (source_command)
+              target: (source_target
+                (word
+                  (bare_word)))
+              argument: (word
+                (bare_word))
+              redirection: (redirection
+                operator: (redirect_operator)
+                destination: (word
+                  (bare_word)))))))))
   (command_list
     (and_or_command
-      (pipeline
-        (command
-          (source_statement
-            command: (source_command)
-            target: (source_target
-              (word
-                (double_quoted_string)))
-            (word
-              (identifier)))))))
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              name: (word
+                (bare_word))
+              argument: (word
+                (double_quoted_string))
+              argument: (word
+                (identifier))))))))
   (command_list
     (and_or_command
-      (pipeline
-        (command
-          (source_statement
-            command: (source_command)
-            target: (source_target
-              (variable_substitution
-                (identifier))
-              (source_path_suffix))
-            (redirection
-              (redirect_operator)
-              (word
-                (bare_word)))))))))
+      (and_command
+        (pipeline
+          (command
+            (source_statement
+              command: (source_command)
+              target: (source_target
+                (word
+                  (variable_substitution
+                    name: (identifier))
+                  (bare_word)))
+              redirection: (redirection
+                operator: (redirect_operator)
+                destination: (word
+                  (bare_word))))))))))
 
 ==================
 parenthesized commands continuation and all redirections
@@ -954,6 +1014,8 @@ echo first \
 second
 echo in < input
 echo here << MARK
+heredoc body
+MARK
 echo clobber > file
 echo force >! file
 echo both >& file
@@ -967,169 +1029,184 @@ echo append_both_force >>&! file
 (source_file
   (command_list
     (and_or_command
-      (pipeline
-        (command
-          (parenthesized_command
-            (command_list
-              (and_or_command
-                (pipeline
-                  (command
-                    (simple_command
-                      (builtin_command
-                        (echo_command))
-                      (word
-                        (identifier)))))))
-            (command_list
-              (and_or_command
-                (pipeline
-                  (command
-                    (simple_command
-                      (builtin_command
-                        (echo_command))
-                      (word
-                        (identifier))))))))))))
+      (and_command
+        (pipeline
+          (command
+            (parenthesized_command
+              (command_list
+                (and_or_command
+                  (and_command
+                    (pipeline
+                      (command
+                        (simple_command
+                          (word
+                            (identifier))
+                          (word
+                            (identifier))))))))
+              (command_list
+                (and_or_command
+                  (and_command
+                    (pipeline
+                      (command
+                        (simple_command
+                          (word
+                            (identifier))
+                          (word
+                            (identifier))))))))))))))
   (command_list
     (and_or_command
-      (pipeline
-        (command
-          (simple_command
-            (builtin_command
-              (echo_command))
-            (word
-              (identifier))
-            (line_continuation)
-            (word
-              (identifier)))))))
-  (command_list
-    (and_or_command
-      (pipeline
-        (command
-          (simple_command
-            (builtin_command
-              (echo_command))
-            (word
-              (identifier))
-            (redirection
-              (redirect_operator)
+      (and_command
+        (pipeline
+          (command
+            (simple_command
               (word
-                (identifier))))))))
+                (identifier))
+              (word
+                (identifier)
+                (line_continuation)
+                (bare_word))))))))
   (command_list
     (and_or_command
-      (pipeline
-        (command
-          (simple_command
-            (builtin_command
-              (echo_command))
-            (word
-              (identifier))
-            (redirection
-              (redirect_operator)
+      (and_command
+        (pipeline
+          (command
+            (simple_command
               (word
-                (identifier))))))))
+                (identifier))
+              (word
+                (identifier))
+              (redirection
+                (redirect_operator)
+                (word
+                  (identifier)))))))))
   (command_list
     (and_or_command
-      (pipeline
-        (command
-          (simple_command
-            (builtin_command
-              (echo_command))
-            (word
-              (identifier))
-            (redirection
-              (redirect_operator)
+      (and_command
+        (pipeline
+          (command
+            (simple_command
               (word
-                (identifier))))))))
+                (identifier))
+              (word
+                (identifier))
+              (redirection
+                (heredoc_redirect
+                  (redirect_operator)
+                  (heredoc_delimiter)
+                  (heredoc_body)
+                  (heredoc_end)))))))))
   (command_list
     (and_or_command
-      (pipeline
-        (command
-          (simple_command
-            (builtin_command
-              (echo_command))
-            (word
-              (identifier))
-            (redirection
-              (redirect_operator)
+      (and_command
+        (pipeline
+          (command
+            (simple_command
               (word
-                (identifier))))))))
+                (identifier))
+              (word
+                (identifier))
+              (redirection
+                (redirect_operator)
+                (word
+                  (identifier)))))))))
   (command_list
     (and_or_command
-      (pipeline
-        (command
-          (simple_command
-            (builtin_command
-              (echo_command))
-            (word
-              (identifier))
-            (redirection
-              (redirect_operator)
+      (and_command
+        (pipeline
+          (command
+            (simple_command
               (word
-                (identifier))))))))
+                (identifier))
+              (word
+                (identifier))
+              (redirection
+                (redirect_operator)
+                (word
+                  (identifier)))))))))
   (command_list
     (and_or_command
-      (pipeline
-        (command
-          (simple_command
-            (builtin_command
-              (echo_command))
-            (word
-              (identifier))
-            (redirection
-              (redirect_operator)
+      (and_command
+        (pipeline
+          (command
+            (simple_command
               (word
-                (identifier))))))))
+                (identifier))
+              (word
+                (identifier))
+              (redirection
+                (redirect_operator)
+                (word
+                  (identifier)))))))))
   (command_list
     (and_or_command
-      (pipeline
-        (command
-          (simple_command
-            (builtin_command
-              (echo_command))
-            (word
-              (identifier))
-            (redirection
-              (redirect_operator)
+      (and_command
+        (pipeline
+          (command
+            (simple_command
               (word
-                (identifier))))))))
+                (identifier))
+              (word
+                (identifier))
+              (redirection
+                (redirect_operator)
+                (word
+                  (identifier)))))))))
   (command_list
     (and_or_command
-      (pipeline
-        (command
-          (simple_command
-            (builtin_command
-              (echo_command))
-            (word
-              (identifier))
-            (redirection
-              (redirect_operator)
+      (and_command
+        (pipeline
+          (command
+            (simple_command
               (word
-                (identifier))))))))
+                (identifier))
+              (word
+                (identifier))
+              (redirection
+                (redirect_operator)
+                (word
+                  (identifier)))))))))
   (command_list
     (and_or_command
-      (pipeline
-        (command
-          (simple_command
-            (builtin_command
-              (echo_command))
-            (word
-              (identifier))
-            (redirection
-              (redirect_operator)
+      (and_command
+        (pipeline
+          (command
+            (simple_command
               (word
-                (identifier))))))))
+                (identifier))
+              (word
+                (identifier))
+              (redirection
+                (redirect_operator)
+                (word
+                  (identifier)))))))))
   (command_list
     (and_or_command
-      (pipeline
-        (command
-          (simple_command
-            (builtin_command
-              (echo_command))
-            (word
-              (identifier))
-            (redirection
-              (redirect_operator)
+      (and_command
+        (pipeline
+          (command
+            (simple_command
               (word
-                (identifier)))))))))
+                (identifier))
+              (word
+                (identifier))
+              (redirection
+                (redirect_operator)
+                (word
+                  (identifier)))))))))
+  (command_list
+    (and_or_command
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              (word
+                (identifier))
+              (word
+                (identifier))
+              (redirection
+                (redirect_operator)
+                (word
+                  (identifier))))))))))
 
 ==================
 additional documented builtin surfaces
@@ -1174,333 +1251,366 @@ warp ucb
 (source_file
   (command_list
     (and_or_command
-      (pipeline
-        (command
-          (simple_command
-            (word
-              (job_spec)))))))
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              (word
+                (job_spec))))))))
   (command_list
     (and_or_command
-      (pipeline
-        (command
-          (simple_command
-            (word
-              (bare_word)))))))
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              (word
+                (bare_word))))))))
   (command_list
     (and_or_command
-      (pipeline
-        (command
-          (simple_command
-            (word
-              (identifier)))))))
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              (word
+                (identifier))))))))
   (command_list
     (and_or_command
-      (pipeline
-        (command
-          (simple_command
-            (word
-              (identifier))
-            (word
-              (identifier))
-            (word
-              (identifier)))))))
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              (word
+                (identifier))
+              (word
+                (identifier))
+              (word
+                (identifier))))))))
   (command_list
     (and_or_command
-      (pipeline
-        (command
-          (simple_command
-            (word
-              (identifier)))))))
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              (word
+                (identifier))))))))
   (command_list
     (and_or_command
-      (pipeline
-        (command
-          (simple_command
-            (word
-              (identifier)))))))
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              (word
+                (identifier))))))))
   (command_list
     (and_or_command
-      (pipeline
-        (command
-          (simple_command
-            (word
-              (identifier))
-            (word
-              (identifier)))))))
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              (word
+                (identifier))
+              (word
+                (identifier))))))))
   (command_list
     (and_or_command
-      (pipeline
-        (command
-          (simple_command
-            (word
-              (identifier))
-            (word
-              (option_word))
-            (word
-              (identifier)))))))
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              (word
+                (identifier))
+              (word
+                (bare_word))
+              (word
+                (identifier))))))))
   (command_list
     (and_or_command
-      (pipeline
-        (command
-          (simple_command
-            (word
-              (identifier)))))))
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              (word
+                (identifier))))))))
   (command_list
     (and_or_command
-      (pipeline
-        (command
-          (simple_command
-            (word
-              (identifier)))))))
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              (word
+                (identifier))))))))
   (command_list
     (and_or_command
-      (pipeline
-        (command
-          (simple_command
-            (word
-              (identifier))
-            (builtin_command
-              (echo_command))
-            (word
-              (identifier)))))))
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              (word
+                (identifier))
+              (word
+                (identifier))
+              (word
+                (identifier))))))))
   (command_list
     (and_or_command
-      (pipeline
-        (command
-          (simple_command
-            (word
-              (identifier))
-            (word
-              (bare_word)))))))
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              (word
+                (identifier))
+              (word
+                (bare_word))))))))
   (command_list
     (and_or_command
-      (pipeline
-        (command
-          (simple_command
-            (builtin_command
-              (jobs_command))
-            (word
-              (option_word))
-            (word
-              (identifier)))))))
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              (word
+                (identifier))
+              (word
+                (bare_word))
+              (word
+                (identifier))))))))
   (command_list
     (and_or_command
-      (pipeline
-        (command
-          (simple_command
-            (builtin_command
-              (kill_command))
-            (word
-              (option_word)))))))
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              (word
+                (identifier))
+              (word
+                (bare_word))))))))
   (command_list
     (and_or_command
-      (pipeline
-        (command
-          (simple_command
-            (builtin_command
-              (kill_command))
-            (word
-              (option_word))
-            (word
-              (identifier))
-            (word
-              (job_spec)))))))
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              (word
+                (identifier))
+              (word
+                (bare_word))
+              (word
+                (identifier))
+              (word
+                (job_spec))))))))
   (command_list
     (and_or_command
-      (pipeline
-        (command
-          (simple_command
-            (word
-              (identifier)))))))
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              (word
+                (identifier))))))))
   (command_list
     (and_or_command
-      (pipeline
-        (command
-          (simple_command
-            (word
-              (identifier))
-            (word
-              (option_word))
-            (word
-              (option_word))
-            (word
-              (identifier)))))))
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              (word
+                (bare_word))
+              (word
+                (bare_word))
+              (word
+                (identifier))))))))
   (command_list
     (and_or_command
-      (pipeline
-        (command
-          (simple_command
-            (word
-              (identifier))
-            (word
-              (option_word))
-            (word
-              (job_spec)))))))
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              (word
+                (identifier))
+              (word
+                (bare_word))
+              (word
+                (job_spec))))))))
   (command_list
     (and_or_command
-      (pipeline
-        (command
-          (simple_command
-            (word
-              (identifier))
-            (word
-              (option_word))
-            (word
-              (identifier)))))))
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              (word
+                (identifier))
+              (word
+                (bare_word))
+              (word
+                (identifier))))))))
   (command_list
     (and_or_command
-      (pipeline
-        (command
-          (simple_command
-            (word
-              (identifier))
-            (word
-              (job_spec)))))))
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              (word
+                (identifier))
+              (word
+                (job_spec))))))))
   (command_list
     (and_or_command
-      (pipeline
-        (command
-          (simple_command
-            (word
-              (identifier))
-            (word
-              (identifier)))))))
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              (word
+                (identifier))
+              (word
+                (identifier))))))))
   (command_list
     (and_or_command
-      (pipeline
-        (command
-          (simple_command
-            (word
-              (identifier))
-            (word
-              (bare_word))
-            (word
-              (identifier)))))))
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              (word
+                (identifier))
+              (word
+                (bare_word))
+              (word
+                (identifier))))))))
   (command_list
     (and_or_command
-      (pipeline
-        (command
-          (simple_command
-            (word
-              (identifier))
-            (word
-              (bare_word))
-            (word
-              (bare_word)))))))
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              (word
+                (identifier))
+              (word
+                (bare_word))
+              (word
+                (bare_word))))))))
   (command_list
     (and_or_command
-      (pipeline
-        (command
-          (simple_command
-            (word
-              (identifier))
-            (word
-              (identifier))
-            (word
-              (identifier))
-            (word
-              (identifier)))))))
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              (word
+                (identifier))
+              (word
+                (identifier))
+              (word
+                (identifier))
+              (word
+                (identifier))))))))
   (command_list
     (and_or_command
-      (pipeline
-        (command
-          (simple_command
-            (word
-              (identifier))
-            (word
-              (identifier))
-            (word
-              (number)))))))
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              (word
+                (identifier))
+              (word
+                (identifier))
+              (word
+                (number))))))))
   (command_list
     (and_or_command
-      (pipeline
-        (command
-          (simple_command
-            (word
-              (identifier))
-            (word
-              (option_word))
-            (word
-              (identifier)))))))
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              (word
+                (identifier))
+              (word
+                (bare_word))
+              (word
+                (identifier))))))))
   (command_list
     (and_or_command
-      (pipeline
-        (command
-          (simple_command
-            (word
-              (identifier))
-            (word
-              (identifier)))))))
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              (word
+                (identifier))
+              (word
+                (identifier))))))))
   (command_list
     (and_or_command
-      (pipeline
-        (command
-          (simple_command
-            (word
-              (identifier))
-            (word
-              (job_spec)))))))
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              (word
+                (identifier))
+              (word
+                (job_spec))))))))
   (command_list
     (and_or_command
-      (pipeline
-        (command
-          (simple_command
-            (word
-              (identifier)))))))
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              (word
+                (identifier))))))))
   (command_list
     (and_or_command
-      (pipeline
-        (command
-          (simple_command
-            (word
-              (identifier))
-            (word
-              (identifier)))))))
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              (word
+                (identifier))
+              (word
+                (identifier))))))))
   (command_list
     (and_or_command
-      (pipeline
-        (command
-          (simple_command
-            (word
-              (identifier))
-            (word
-              (identifier)))))))
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              (word
+                (identifier))
+              (word
+                (identifier))))))))
   (command_list
     (and_or_command
-      (pipeline
-        (command
-          (simple_command
-            (word
-              (identifier)))))))
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              (word
+                (identifier))))))))
   (command_list
     (and_or_command
-      (pipeline
-        (command
-          (simple_command
-            (word
-              (identifier))
-            (word
-              (identifier)))))))
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              (word
+                (identifier))
+              (word
+                (identifier))))))))
   (command_list
     (and_or_command
-      (pipeline
-        (command
-          (simple_command
-            (word
-              (identifier))
-            (word
-              (identifier))
-            (word
-              (identifier)))))))
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              (word
+                (identifier))
+              (word
+                (identifier))
+              (word
+                (identifier))))))))
   (command_list
     (and_or_command
-      (pipeline
-        (command
-          (simple_command
-            (word
-              (identifier))
-            (word
-              (identifier))))))))
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              (word
+                (identifier))
+              (word
+                (identifier)))))))))
 
 ==================
 review blocker probes
@@ -1517,48 +1627,51 @@ alias ll echo
 (source_file
   (command_list
     (and_or_command
-      (pipeline
-        (command
-          (simple_command
-            (builtin_command
-              (complete_command))
-            (builtin_command
-              (cd_command))
-            (word
-              (single_quoted_string)))))))
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              (word
+                (identifier))
+              (word
+                (identifier))
+              (word
+                (single_quoted_string))))))))
   (command_list
     (and_or_command
-      (pipeline
-        (command
-          (simple_command
-            (builtin_command
-              (eval_command))
-            (builtin_command
-              (echo_command))
-            (word
-              (identifier)))))))
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              (word
+                (identifier))
+              (word
+                (identifier))
+              (word
+                (identifier))))))))
   (command_list
     (and_or_command
-      (pipeline
-        (command
-          (simple_command
-            (builtin_command
-              (exec_command))
-            (builtin_command
-              (echo_command))
-            (builtin_command
-              (exec_command)))))))
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              (word
+                (identifier))
+              (word
+                (identifier))
+              (word
+                (identifier))))))))
   (command_list
     (and_or_command
-      (pipeline
-        (command
-          (simple_command
-            (builtin_command
-              (alias_command))
-            (word
-              (identifier))
-            (builtin_command
-              (echo_command)))))))
+      (and_command
+        (pipeline
+          (command
+            (alias_statement
+              (alias_command)
+              (word
+                (identifier))
+              (word
+                (identifier))))))))
   (at_statement
     (identifier)
     (update_operator))
@@ -1585,76 +1698,80 @@ if ( { echo ok } ) echo ok
 
 (source_file
   (comment)
-  (repeat_statement
-    (expression
-      (number))
-    (command_list
-      (and_or_command
+  (command_list
+    (and_or_command
+      (and_command
         (pipeline
           (command
-            (simple_command
-              (builtin_command
-                (echo_command))
+            (repeat_statement
               (word
-                (identifier))))))))
+                (number))
+              (simple_command
+                (word
+                  (identifier))
+                (word
+                  (identifier)))))))))
   (onintr_statement
     (word
       (identifier)))
   (command_list
     (and_or_command
-      (pipeline
-        (command
-          (simple_command
-            (builtin_command
-              (time_command))
-            (builtin_command
-              (echo_command))
-            (word
-              (identifier)))))))
-  (command_list
-    (and_or_command
-      (pipeline
-        (command
-          (simple_command
-            (builtin_command
-              (exit_command))
-            (word
-              (number)))))))
-  (command_list
-    (and_or_command
-      (pipeline
-        (command
-          (simple_command
-            (builtin_command
-              (echo_command))
-            (word
-              (identifier))
-            (word
-              (escape_sequence))
-            (word
-              (identifier))
-            (word
-              (variable_substitution
-                (identifier)
-                (substitution_modifier))))))))
-  (if_statement
-    (expression
-      (command_status_expression
-        (command_list
-          (and_or_command
-            (pipeline
-              (command
-                (simple_command
-                  (builtin_command
-                    (echo_command))
-                  (word
-                    (identifier)))))))))
-    (command_list
-      (and_or_command
+      (and_command
         (pipeline
           (command
             (simple_command
-              (builtin_command
-                (echo_command))
               (word
-                (identifier)))))))))
+                (identifier))
+              (word
+                (identifier))
+              (word
+                (identifier))))))))
+  (command_list
+    (and_or_command
+      (and_command
+        (pipeline
+          (command
+            (exit_statement
+              (exit_command)
+              (expression
+                (number))))))))
+  (command_list
+    (and_or_command
+      (and_command
+        (pipeline
+          (command
+            (simple_command
+              (word
+                (identifier))
+              (word
+                (identifier)
+                (escape_sequence)
+                (bare_word))
+              (word
+                (variable_substitution
+                  (identifier)
+                  (substitution_modifier)))))))))
+  (command_list
+    (and_or_command
+      (and_command
+        (pipeline
+          (command
+            (if_statement
+              (expression
+                (command_status_expression
+                  (command_list
+                    (and_or_command
+                      (and_command
+                        (pipeline
+                          (command
+                            (simple_command
+                              (word
+                                (identifier))
+                              (word
+                                (identifier))))))))))
+              (command
+                (simple_command
+                  (word
+                    (identifier))
+                  (word
+                    (identifier)))))))))))
