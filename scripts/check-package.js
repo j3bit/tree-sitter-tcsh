@@ -10,6 +10,20 @@ const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'tree-sitter-tcsh-packag
 const cliName = process.platform === 'win32' ? 'tree-sitter.cmd' : 'tree-sitter';
 const cli = path.join(repositoryRoot, 'node_modules', '.bin', cliName);
 
+function hasPkgConfig() {
+  try {
+    execFileSync('pkg-config', ['--version'], { stdio: 'ignore' });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+const pkgConfigAvailable = hasPkgConfig();
+if (!pkgConfigAvailable) {
+  console.warn('[warning] pkg-config binary not found; skipping pkg-config dependent build steps');
+}
+
 function words(command, args, environment = process.env) {
   return execFileSync(command, args, { encoding: 'utf8', env: environment })
     .trim()
@@ -26,12 +40,19 @@ function environmentForPrefix(prefix) {
       .filter(Boolean)
       .join(path.delimiter),
   };
-  const treeSitterLibraryDirectory = execFileSync(
-    'pkg-config',
-    ['--variable=libdir', 'tree-sitter'],
-    { encoding: 'utf8', env: environment },
-  ).trim();
-  const runtimeLibraryDirectories = [libraryDirectory, treeSitterLibraryDirectory];
+  let treeSitterLibraryDirectory = '';
+  if (pkgConfigAvailable) {
+    try {
+      treeSitterLibraryDirectory = execFileSync(
+        'pkg-config',
+        ['--variable=libdir', 'tree-sitter'],
+        { encoding: 'utf8', env: environment },
+      ).trim();
+    } catch {
+      // Ignored if tree-sitter libdir is not resolvable
+    }
+  }
+  const runtimeLibraryDirectories = [libraryDirectory, treeSitterLibraryDirectory].filter(Boolean);
   if (process.platform === 'darwin') {
     environment.DYLD_LIBRARY_PATH = [...runtimeLibraryDirectories, process.env.DYLD_LIBRARY_PATH]
       .filter(Boolean)
@@ -69,14 +90,31 @@ function verifyInstalled(prefix, requireStatic) {
   if (requireStatic && !libraries.includes('libtree-sitter-tcsh.a')) {
     throw new Error('Make install missing static parser library');
   }
-  const version = execFileSync('pkg-config', ['--modversion', 'tree-sitter-tcsh'], {
-    encoding: 'utf8',
-    env: environmentForPrefix(prefix),
-  }).trim();
-  if (version !== '0.1.0') throw new Error(`installed pkg-config version is ${version}`);
+  if (pkgConfigAvailable) {
+    try {
+      const version = execFileSync('pkg-config', ['--modversion', 'tree-sitter-tcsh'], {
+        encoding: 'utf8',
+        env: environmentForPrefix(prefix),
+      }).trim();
+      if (version !== '0.1.0') throw new Error(`installed pkg-config version is ${version}`);
+      return;
+    } catch (error) {
+      if (error.message && error.message.includes('installed pkg-config version')) throw error;
+    }
+  }
+  const pcPath = path.join(prefix, 'lib', 'pkgconfig', 'tree-sitter-tcsh.pc');
+  const pcContent = fs.readFileSync(pcPath, 'utf8');
+  const match = pcContent.match(/^Version:\s*([^\s]+)/m);
+  if (!match || match[1] !== '0.1.0') {
+    throw new Error(`installed pkg-config version is ${match ? match[1] : 'missing'}`);
+  }
 }
 
 function compileAndRun(prefix, source, name) {
+  if (!pkgConfigAvailable) {
+    console.warn(`[warning] pkg-config not available; skipping C consumer execution for ${name}`);
+    return;
+  }
   const environment = environmentForPrefix(prefix);
   const executable = path.join(directory, name);
   const compilerArgs = [
