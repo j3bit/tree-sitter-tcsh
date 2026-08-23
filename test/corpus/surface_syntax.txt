@@ -434,6 +434,8 @@ builtin surface forms
 alias ll 'ls -l'
 unalias ll
 set var = value
+set arr[1] = 10
+set arr[1-2] = ( 10 20 )
 unset var
 setenv EDITOR vim
 unsetenv EDITOR
@@ -505,6 +507,39 @@ sched +60 echo later
                 name: (identifier)
                 value: (word
                   (identifier)))))))))
+  (command_list
+    (and_or_command
+      (and_command
+        (pipeline
+          (command
+            (set_statement
+              command: (set_command)
+              (set_assignment
+                name: (identifier)
+                (subscript
+                  start: (selector_index
+                    (number)))
+                value: (word
+                  (number)))))))))
+  (command_list
+    (and_or_command
+      (and_command
+        (pipeline
+          (command
+            (set_statement
+              command: (set_command)
+              (set_assignment
+                name: (identifier)
+                (subscript
+                  start: (selector_index
+                    (number))
+                  end: (selector_index
+                    (number)))
+                value: (parenthesized_word_list
+                  (word
+                    (number))
+                  (word
+                    (number))))))))))
   (command_list
     (and_or_command
       (and_command

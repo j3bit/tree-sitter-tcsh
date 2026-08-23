@@ -156,8 +156,31 @@ module.exports = grammar({
 
     set_statement: $ => prec.right(seq(
       field('command', $.set_command),
-      repeat(choice($.set_assignment, $.word, $.redirection)),
+      repeat(choice($.set_assignment, $._set_word, $.redirection)),
     )),
+
+    _set_word: $ => alias($._set_word_content, $.word),
+    _set_word_content: $ => prec.right(seq(
+      $._set_word_fragment,
+      repeat($._immediate_word_fragment),
+    )),
+    _set_word_fragment: $ => choice(
+      $.identifier,
+      $.number,
+      $.bare_word,
+      $.escape_sequence,
+      $.single_quoted_string,
+      $.dollar_single_quoted_string,
+      $.double_quoted_string,
+      $.backtick_command_substitution,
+      $.variable_substitution,
+      $.literal_dollar,
+      $.history_substitution,
+      $.literal_bang,
+      $.brace_pattern,
+      $.directory_stack_reference,
+      $.job_spec,
+    ),
 
     set_assignment: $ => prec.right(seq(
       field('name', $.identifier),
@@ -452,7 +475,18 @@ module.exports = grammar({
     )),
     selector_index: $ => choice(
       alias($._immediate_number, $.number),
-      seq(token.immediate('$'), choice(alias($._immediate_identifier, $.identifier), alias($._immediate_number, $.number), alias(token.immediate('#'), $.special_parameter))),
+      seq(
+        token.immediate('$'),
+        choice(
+          alias($._immediate_identifier, $.identifier),
+          alias($._immediate_number, $.number),
+          alias(token.immediate('#'), $.special_parameter),
+          seq(
+            alias(token.immediate('#'), $.special_parameter),
+            alias($._immediate_identifier, $.identifier),
+          ),
+        ),
+      ),
     ),
     substitution_modifier: _ => token.immediate(prec(5, /:(?:[ag]*(?:[htrueulqx&]|s\/(?:\\.|[^/\n])*\/(?:\\.|[^/\n])*(?:\/)?))/)),
     history_substitution: $ => prec.right(6, seq('!', $._history_reference)),
@@ -460,6 +494,7 @@ module.exports = grammar({
     _history_reference: $ => prec.right(choice(
       seq(field('event', $.history_event), optional(field('designator', $.history_word_designator)), repeat(field('modifier', $.history_modifier))),
       seq(field('designator', $.history_word_designator), repeat(field('modifier', $.history_modifier))),
+      repeat1(field('modifier', $.history_modifier)),
     )),
     history_event: $ => choice(
       alias(token.immediate(/[!#]/), $.history_event_name),

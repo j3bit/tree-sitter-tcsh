@@ -3,10 +3,10 @@ structured substitutions and patterns
 ==================
 echo $* $%name $< $?<
 echo ${name} ${1} ${?prompt} $?prompt
-echo $a[1-] $a[-2] $a[$lo-$hi]
+echo $a[1-] $a[-2] $a[$lo-$hi] $var[$#var]
 echo ${path:h} ${path}:h
 echo !!:2 !?text?:h !{event}:$
-echo !! !$ !:2
+echo !! !$ !:2 !:h !:t !:s/a/b/ !:p
 echo $x:s/old/new/
 echo 'history !! survives' $'dollar\nquoted'
 echo `hostname` ! 'literal !'
@@ -87,6 +87,13 @@ echo =0 =-/tail %?editor %1 %name
                     (selector_index
                       (identifier))
                     (selector_index
+                      (identifier)))))
+              (word
+                (variable_substitution
+                  (identifier)
+                  (subscript
+                    (selector_index
+                      (special_parameter)
                       (identifier)))))))))))
   (command_list
     (and_or_command
@@ -144,7 +151,19 @@ echo =0 =-/tail %?editor %1 %name
                   (history_word_designator)))
               (word
                 (history_substitution
-                  (history_word_designator)))))))))
+                  (history_word_designator)))
+              (word
+                (history_substitution
+                  (history_modifier)))
+              (word
+                (history_substitution
+                  (history_modifier)))
+              (word
+                (history_substitution
+                  (history_modifier)))
+              (word
+                (history_substitution
+                  (history_modifier)))))))))
   (command_list
     (and_or_command
       (and_command
